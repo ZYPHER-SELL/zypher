@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zypher Admin Panel</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 100px auto;
+            padding: 20px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            font-size: 36px;
+        }
+
+        .admin-section {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .admin-section h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .admin-form {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .admin-form input, .admin-form textarea {
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        .admin-form button {
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .badge-pending {
+            background: rgba(234, 88, 12, 0.2);
+            color: #ea580c;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">Zypher</a>
+            <ul class="nav-links">
+                <li><a href="/">Website</a></li>
+                <li><a href="/admin">Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Admin Panel</h1>
+            <a href="/" class="btn btn-secondary">View Website</a>
+        </div>
+
+        <div class="admin-section">
+            <h2>Add New Product</h2>
+            <div class="admin-form">
+                <input type="text" id="productName" placeholder="Product Name">
+                <textarea id="productDesc" placeholder="Product Description" rows="3"></textarea>
+                <input type="number" id="productPrice" placeholder="Price (USD)" step="0.01">
+                <button onclick="addProduct()">Add Product</button>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2>Recent Orders</h2>
+            <table id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Email</th>
+                        <th>Product</th>
+                        <th>Amount</th>
+                        <th>License Key</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="admin-section">
+            <h2>License Keys</h2>
+            <table id="keysTable">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Product</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function addProduct() {
+            const name = document.getElementById('productName').value;
+            const description = document.getElementById('productDesc').value;
+            const price = document.getElementById('productPrice').value;
+
+            if (!name || !description || !price) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description, price })
+                });
+
+                if (response.ok) {
+                    alert('Product added successfully!');
+                    document.getElementById('productName').value = '';
+                    document.getElementById('productDesc').value = '';
+                    document.getElementById('productPrice').value = '';
+                    loadProducts();
+                }
+            } catch (error) {
+                alert('Failed to add product');
+            }
+        }
+
+        async function loadOrders() {
+            try {
+                const response = await fetch('/api/admin/orders');
+                const orders = await response.json();
+                const tbody = document.querySelector('#ordersTable tbody');
+
+                tbody.innerHTML = orders.map(order => `
+                    <tr>
+                        <td style="font-family: monospace; font-size: 12px;">${order.id.substring(0, 20)}...</td>
+                        <td>${order.email}</td>
+                        <td>${order.product_name}</td>
+                        <td>$${(order.amount / 100).toFixed(2)}</td>
+                        <td style="font-family: monospace; font-size: 12px;">${order.license_key}</td>
+                        <td>${new Date(order.created_at).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load orders:', error);
+            }
+        }
+
+        async function loadKeys() {
+            try {
+                const response = await fetch('/api/admin/keys');
+                const keys = await response.json();
+                const tbody = document.querySelector('#keysTable tbody');
+
+                tbody.innerHTML = keys.map(key => `
+                    <tr>
+                        <td style="font-family: monospace; font-size: 12px;">${key.key}</td>
+                        <td>${key.product_id}</td>
+                        <td>${key.email}</td>
+                        <td><span class="badge ${key.used ? 'badge-pending' : 'badge-success'}">${key.used ? 'Used' : 'Unused'}</span></td>
+                        <td>${new Date(key.created_at).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load keys:', error);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadOrders();
+            loadKeys();
+        });
+    </script>
+</body>
+</html>

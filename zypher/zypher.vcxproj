@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3E5A9C8F-7D2B-4E6F-B2G1-0C8F3D6E9F22}</ProjectGuid>
+    <RootNamespace>zypher</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)x64\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)x64\$(Configuration)\obj\</IntDir>
+    <TargetName>zypher</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)src\gui;$(ProjectDir)src\gui\Menu\Framework\Render\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>gui_pch.hpp</ForcedIncludeFiles>
+      <ConformanceMode>true</ConformanceMode>
+      <WarningLevel>Level3</WarningLevel>
+      <DisableSpecificWarnings>4244;4267;4305;4146;4838;4099;4996;4324</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;d3dcompiler.lib;dwmapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\gui\SDK\Math\Math.cpp" />
+    <ClCompile Include="src\main.cpp">
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="src\gui\ZypherUI.cpp" />
+    <ClCompile Include="src\gui\gui_runtime.cpp" />
+    <ClCompile Include="src\gui\gui_shell.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Color.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Container\Container.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Input\Input.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Object\Object.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Render\Render.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Render\imgui\imgui.cpp">
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="src\gui\Menu\Framework\Render\imgui\imgui_draw.cpp">
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="src\gui\Menu\Framework\Render\imgui\imgui_impl_dx11.cpp">
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="src\gui\Menu\Framework\Render\imgui\imgui_impl_win32.cpp">
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="src\gui\Menu\Framework\Render\imgui\imgui_tables.cpp">
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="src\gui\Menu\Framework\Render\imgui\imgui_widgets.cpp">
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="src\gui\Menu\Framework\Style\Style.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Tab\Subtab.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Tab\Tab.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\UI\ui.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\Button\Button.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\Checkbox\Checkbox.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\ColorPicker\ColorPicker.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\ConfirmationButton\ConfirmationButton.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\Dropdown\Dropdown.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\Keybind\Keybind.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\Label\Label.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\Listbox\Listbox.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\MultiDropdown\MultiDropdown.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\Popup\Popup.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\Seperator\Seperator.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\Slider\Slider.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Widgets\TextInput\TextInput.cpp" />
+    <ClCompile Include="src\gui\Menu\Framework\Window\Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\gui\Assets\game_images.h" />
+    <ClInclude Include="src\gui\Assets\game_images_data.h" />
+    <ClInclude Include="src\gui\gui_pch.hpp" />
+    <ClInclude Include="src\gui\gui_runtime.h" />
+    <ClInclude Include="src\gui\ZypherUI.h" />
+    <ClInclude Include="src\gui\Menu\Framework\Color.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Container\Container.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Input\Input.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Object\Object.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\Assets\font_awesome.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\Assets\font_awesome_data.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\Assets\montserrat.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\Assets\montserrat_semibold.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\Assets\pixelmix.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\imgui\imconfig.h" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\imgui\imgui.h" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\imgui\imgui_internal.h" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\imgui\imstb_textedit.h" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\imgui\misc\freetype\imgui_freetype.h" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\Render.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Render\stb_image.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Style\Style.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Tab\Subtab.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Tab\Tab.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\UI\ui.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\Button\Button.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\Checkbox\Checkbox.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\ColorPicker\ColorPicker.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\ConfirmationButton\ConfirmationButton.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\Dropdown\Dropdown.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\Keybind\Keybind.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\Label\label.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\Listbox\Listbox.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\MultiDropdown\MultiDropdown.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\Popup\Popup.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\Seperator\Seperator.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\Slider\Slider.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Widgets\TextInput\TextInput.hpp" />
+    <ClInclude Include="src\gui\Menu\Framework\Window\Window.hpp" />
+    <ClInclude Include="src\gui\resource.h" />
+    <ClInclude Include="src\gui\SDK\Math\Math.hpp" />
+    <ClInclude Include="src\gui\SDK\Math\Matrix3x4.hpp" />
+    <ClInclude Include="src\gui\SDK\Math\Transform.hpp" />
+    <ClInclude Include="src\gui\SDK\Math\Vector2.hpp" />
+    <ClInclude Include="src\gui\SDK\Math\Vector3.hpp" />
+    <ClInclude Include="src\gui\SDK\Math\Vector4.hpp" />
+    <ClInclude Include="src\gui\SDK\Math\Vector4f.hpp" />
+    <ClInclude Include="src\gui\self_auth_stub.h" />
+    <ClInclude Include="src\gui\Utilities\Security\XorStr\XorStr.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

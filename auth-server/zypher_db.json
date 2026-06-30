@@ -1,0 +1,12 @@
+{
+  "licenses": [],
+  "admins": [
+    {
+      "username": "admin",
+      "password_hash": "$2a$10$Qu6qaQajPk78mxlcihXRDemS097tFRFBQGYgoD6WPpBvhWsOA3S4e",
+      "created_at": "2026-06-30T07:15:42.752Z"
+    }
+  ],
+  "auth_logs": [],
+  "sessions": []
+}

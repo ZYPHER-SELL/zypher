@@ -1,0 +1,131 @@
+========================================
+  ZYPHER - START HERE
+========================================
+
+STEP 1: START THE SERVICES
+---------------------------
+Double-click: start-all.bat
+
+This will start:
+- Auth Server (port 3000)
+- Website (port 4000)
+
+
+STEP 2: TEST LOCALLY
+---------------------
+Open your browser:
+
+Website:    http://localhost:4000
+Auth Admin: http://localhost:3000
+
+Auth Admin Login:
+  Username: admin
+  Password: admin123
+
+
+STEP 3: MAKE IT PUBLIC (So others can access)
+----------------------------------------------
+Option A - Using ngrok (Easiest):
+
+1. Download ngrok: https://ngrok.com/download
+2. Sign up (free) and get your authtoken
+3. Open PowerShell and run:
+   
+   ngrok http 4000
+
+4. Copy the HTTPS URL it shows you
+   (looks like: https://abc123.ngrok.io)
+
+5. Share that URL with anyone!
+
+
+Option B - Port Forwarding:
+
+1. Get your public IP: https://whatismyipaddress.com
+2. Forward port 4000 on your router
+3. Share: http://YOUR_IP:4000
+
+
+STEP 4: ADD PRODUCTS
+---------------------
+1. Go to: http://localhost:4000/admin
+2. Fill in product details
+3. Click "Add Product"
+
+
+STEP 5: TEST PURCHASE
+----------------------
+1. Go to your website
+2. Click "Buy Now" on a product
+3. Enter your email
+4. Use Stripe test card: 4242 4242 4242 4242
+5. Check email for license key
+
+
+STEP 6: GENERATE LICENSE KEYS
+------------------------------
+1. Go to: http://localhost:3000
+2. Login: admin / admin123
+3. Click "Generate Key"
+4. Copy the key
+5. Give to customers
+
+
+========================================
+  TROUBLESHOOTING
+========================================
+
+Can't login to auth admin?
+- Make sure auth server is running
+- Clear browser cache (Ctrl+Shift+Delete)
+- Try: admin / admin123
+- Delete zypher_db.json and restart
+
+Website not public?
+- Run: ngrok http 4000
+- Share the HTTPS URL
+
+Email not sending?
+- Setup Gmail app password
+- Check spam folder
+
+
+========================================
+  FILES YOU NEED
+========================================
+
+For Website (website/.env):
+- Stripe API keys (from stripe.com)
+- Gmail credentials (for sending emails)
+
+For Auth Server:
+- Nothing! Works out of the box
+
+
+========================================
+  SERVICES RUNNING
+========================================
+
+Auth Server:  Port 3000
+Website:      Port 4000
+
+Both must be running for everything to work!
+
+
+========================================
+  NEED HELP?
+========================================
+
+Read these files:
+- README.md (main guide)
+- SETUP.md (detailed setup)
+- PUBLIC_ACCESS.md (making it public)
+
+Or check the code comments in:
+- auth-server/server.js
+- website/server.js
+
+
+========================================
+
+You're all set! Start selling! 

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zypher - Premium Software Solutions</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo">Zypher</a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#stats">About</a></li>
+                <li><a href="#" onclick="openModal('contact')">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>The Future of Software</h1>
+            <p>Premium tools designed for professionals. Secure, reliable, and built to perform.</p>
+            <div class="cta-buttons">
+                <a href="#products" class="btn btn-primary">View Products</a>
+                <a href="#features" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <h2 class="section-title">Why Choose Zypher?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">🔒</span>
+                <h3>Secure & Private</h3>
+                <p>Industry-leading security with HWID locking, encrypted communications, and anti-tamper protection.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">⚡</span>
+                <h3>Lightning Fast</h3>
+                <p>Optimized performance with minimal overhead. Built for speed and efficiency.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🎯</span>
+                <h3>Precision Engineered</h3>
+                <p>Every feature carefully crafted to deliver the best experience possible.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🛡️</span>
+                <h3>Reliable & Stable</h3>
+                <p>Battle-tested code that works when you need it. 99.9% uptime guaranteed.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🔄</span>
+                <h3>Auto Updates</h3>
+                <p>Always stay up to date with automatic updates delivered seamlessly.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">💬</span>
+                <h3>24/7 Support</h3>
+                <p>Our team is always here to help. Get support whenever you need it.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="stats" class="stats">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3>10K+</h3>
+                <p>Active Users</p>
+            </div>
+            <div class="stat-item">
+                <h3>99.9%</h3>
+                <p>Uptime</p>
+            </div>
+            <div class="stat-item">
+                <h3>24/7</h3>
+                <p>Support</p>
+            </div>
+            <div class="stat-item">
+                <h3>5★</h3>
+                <p>Rating</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="products" class="products">
+        <h2 class="section-title">Our Products</h2>
+        <div class="products-grid" id="productsGrid">
+            <!-- Products will be loaded here -->
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Refund Policy</a>
+                <a href="#" onclick="openModal('contact')">Contact</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Zypher. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Purchase Modal -->
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content">
+            <h2>Complete Your Purchase</h2>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="buyerEmail" placeholder="your@email.com">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="completePurchase()">Proceed to Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <h2>Contact Us</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="contactEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <input type="text" id="contactMessage" placeholder="How can we help?">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="sendContact()">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

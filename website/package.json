@@ -1,0 +1,18 @@
+{
+  "name": "zypher-website",
+  "version": "1.0.0",
+  "description": "Zypher commercial website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "stripe": "^14.0.0",
+    "nodemailer": "^6.9.7",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
+    "body-parser": "^1.20.2"
+  }
+}
