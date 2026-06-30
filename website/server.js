@@ -3,8 +3,8 @@ const express = require('express');
 const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 const nodemailer = process.env.EMAIL_USER ? require('nodemailer') : null;
 const crypto = require('crypto');
-const fs = require('fs');
 const path = require('path');
+const { MongoClient } = require('mongodb');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -22,25 +22,69 @@ app.get('/js/*', (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, req.path));
 });
 
-const DB_PATH = process.env.VERCEL ? '/tmp/db.json' : path.join(__dirname, 'db.json');
-let db = { products: [], orders: [], license_keys: [] };
+// MongoDB connection
+const MONGODB_URI = process.env.MONGODB_URI;
+let db = null;
+let productsCol = null;
+let ordersCol = null;
+let keysCol = null;
 
-function loadDB() {
-    if (fs.existsSync(DB_PATH)) {
-        try { db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8')); } catch(e) {}
-    } else if (fs.existsSync(path.join(__dirname, 'db.json'))) {
-        try { db = JSON.parse(fs.readFileSync(path.join(__dirname, 'db.json'), 'utf8')); } catch(e) {}
-        saveDB();
-    } else {
-        saveDB();
+async function connectDB() {
+    if (!MONGODB_URI) {
+        console.warn('No MONGODB_URI set - using in-memory storage (data will be lost on restart)');
+        return;
+    }
+    try {
+        const client = await MongoClient.connect(MONGODB_URI);
+        db = client.db('zypher');
+        productsCol = db.collection('products');
+        ordersCol = db.collection('orders');
+        keysCol = db.collection('license_keys');
+        console.log('Connected to MongoDB');
+
+        // Pre-populate if no products exist
+        const count = await productsCol.countDocuments();
+        if (count === 0) {
+            await productsCol.insertOne({
+                id: 'zypher-loader-001',
+                name: 'Zypher Loader',
+                description: 'Multi-game cheat loader with HWID locking, auto-updates, and premium support',
+                tiers: [
+                    { id: 'tier-3day', name: '3 Day Key', price: 15, duration_days: 3 },
+                    { id: 'tier-1week', name: '1 Week Key', price: 25, duration_days: 7 },
+                    { id: 'tier-1month', name: '1 Month Key', price: 45, duration_days: 30 },
+                    { id: 'tier-lifetime', name: 'Lifetime Key', price: 100, duration_days: 0 }
+                ],
+                created_at: new Date().toISOString()
+            });
+            console.log('Pre-populated Zypher Loader product');
+        }
+    } catch (err) {
+        console.error('MongoDB connection failed:', err.message);
     }
 }
 
-function saveDB() {
-    try { fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2)); } catch(e) { console.error('DB write failed:', e.message); }
-}
+// In-memory fallback if no MongoDB
+let memoryDB = {
+    products: [{
+        id: 'zypher-loader-001',
+        name: 'Zypher Loader',
+        description: 'Multi-game cheat loader with HWID locking, auto-updates, and premium support',
+        tiers: [
+            { id: 'tier-3day', name: '3 Day Key', price: 15, duration_days: 3 },
+            { id: 'tier-1week', name: '1 Week Key', price: 25, duration_days: 7 },
+            { id: 'tier-1month', name: '1 Month Key', price: 45, duration_days: 30 },
+            { id: 'tier-lifetime', name: 'Lifetime Key', price: 100, duration_days: 0 }
+        ],
+        created_at: new Date().toISOString()
+    }],
+    orders: [],
+    license_keys: []
+};
 
-loadDB();
+function getProducts() { return productsCol ? productsCol.find({}).toArray() : Promise.resolve(memoryDB.products); }
+function getOrders() { return ordersCol ? ordersCol.find({}).sort({ created_at: -1 }).toArray() : Promise.resolve(memoryDB.orders); }
+function getKeys() { return keysCol ? keysCol.find({}).sort({ created_at: -1 }).toArray() : Promise.resolve(memoryDB.license_keys); }
 
 let transporter = null;
 if (nodemailer && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
@@ -65,17 +109,16 @@ async function sendReceiptEmail(email, orderId, productName, licenseKey, amount)
             from: process.env.EMAIL_USER,
             to: email,
             subject: `Zypher - Order Confirmation #${orderId}`,
-            html: `
-                <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1a1028;color:#e0d0f0;padding:40px;border-radius:12px;">
-                    <h1 style="color:#a78bfa;text-align:center;">Thank You!</h1>
-                    <p><strong>Order:</strong> ${orderId}</p>
-                    <p><strong>Product:</strong> ${productName}</p>
-                    <p><strong>Amount:</strong> $${(amount/100).toFixed(2)}</p>
-                    <div style="background:rgba(34,197,94,0.1);padding:20px;border-radius:8px;margin:20px 0;border:1px solid #22c55e;">
-                        <h2 style="color:#22c55e;margin-top:0;">Your License Key</h2>
-                        <p style="font-family:monospace;font-size:18px;background:#0f0a1a;padding:15px;border-radius:6px;text-align:center;">${licenseKey}</p>
-                    </div>
-                </div>`
+            html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1a1028;color:#e0d0f0;padding:40px;border-radius:12px;">
+                <h1 style="color:#a78bfa;text-align:center;">Thank You!</h1>
+                <p><strong>Order:</strong> ${orderId}</p>
+                <p><strong>Product:</strong> ${productName}</p>
+                <p><strong>Amount:</strong> $${(amount/100).toFixed(2)}</p>
+                <div style="background:rgba(34,197,94,0.1);padding:20px;border-radius:8px;margin:20px 0;border:1px solid #22c55e;">
+                    <h2 style="color:#22c55e;margin-top:0;">Your License Key</h2>
+                    <p style="font-family:monospace;font-size:18px;background:#0f0a1a;padding:15px;border-radius:6px;text-align:center;">${licenseKey}</p>
+                </div>
+            </div>`
         });
     } catch (e) { console.error('Email failed:', e); }
 }
@@ -96,11 +139,14 @@ app.get('/cancel', (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, 'cancel.html'));
 });
 
-app.get('/api/products', (req, res) => {
-    res.json(db.products);
+app.get('/api/products', async (req, res) => {
+    try {
+        const products = await getProducts();
+        res.json(products);
+    } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/admin/products', (req, res) => {
+app.post('/api/admin/products', async (req, res) => {
     try {
         const { name, description, tiers } = req.body;
         if (!name || !description || !tiers || !Array.isArray(tiers) || tiers.length === 0) {
@@ -118,8 +164,11 @@ app.post('/api/admin/products', (req, res) => {
             })),
             created_at: new Date().toISOString()
         };
-        db.products.push(product);
-        saveDB();
+        if (productsCol) {
+            await productsCol.insertOne(product);
+        } else {
+            memoryDB.products.push(product);
+        }
         res.json(product);
     } catch (error) {
         console.error('Error creating product:', error);
@@ -130,7 +179,8 @@ app.post('/api/admin/products', (req, res) => {
 app.post('/api/checkout', async (req, res) => {
     try {
         const { email, productId, tierId } = req.body;
-        const product = db.products.find(p => p.id === productId);
+        const products = await getProducts();
+        const product = products.find(p => p.id === productId);
         if (!product) return res.status(404).json({ error: 'Product not found' });
         const tier = product.tiers.find(t => t.id === tierId);
         if (!tier) return res.status(404).json({ error: 'Tier not found' });
@@ -176,35 +226,49 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
         const tierName = session.metadata.tierName;
         const durationDays = parseInt(session.metadata.durationDays) || 0;
         const email = session.metadata.email;
-        const product = db.products.find(p => p.id === productId);
+        const products = await getProducts();
+        const product = products.find(p => p.id === productId);
         if (product) {
             const licenseKey = generateLicenseKey();
             let expiresAt = null;
             if (durationDays > 0) {
                 expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
             }
-            db.license_keys.push({
+            const keyDoc = {
                 key: licenseKey, product_id: productId, tier_id: tierId, tier_name: tierName,
                 email, order_id: session.id, created_at: new Date().toISOString(),
                 expires_at: expiresAt, used: false
-            });
-            db.orders.push({
+            };
+            const orderDoc = {
                 id: session.id, email, product_id: productId, product_name: product.name,
                 tier_name: tierName, amount: session.amount_total, license_key: licenseKey,
                 created_at: new Date().toISOString()
-            });
-            saveDB();
+            };
+            if (keysCol) {
+                await keysCol.insertOne(keyDoc);
+                await ordersCol.insertOne(orderDoc);
+            } else {
+                memoryDB.license_keys.push(keyDoc);
+                memoryDB.orders.push(orderDoc);
+            }
             await sendReceiptEmail(email, session.id, product.name, licenseKey, session.amount_total);
         }
     }
     res.json({ received: true });
 });
 
-app.get('/api/admin/orders', (req, res) => { res.json(db.orders); });
-app.get('/api/admin/keys', (req, res) => { res.json(db.license_keys); });
+app.get('/api/admin/orders', async (req, res) => {
+    try { res.json(await getOrders()); } catch (e) { res.status(500).json({ error: e.message }); }
+});
 
-app.listen(PORT, () => {
-    console.log(`Zypher website running on port ${PORT}`);
+app.get('/api/admin/keys', async (req, res) => {
+    try { res.json(await getKeys()); } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Zypher website running on port ${PORT}`);
+    });
 });
 
 module.exports = app;
