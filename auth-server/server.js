@@ -11,8 +11,21 @@ const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
+
+const SECRETS_PATH = path.join(__dirname, 'secrets.json');
+let secrets;
+if (fs.existsSync(SECRETS_PATH)) {
+    secrets = JSON.parse(fs.readFileSync(SECRETS_PATH, 'utf8'));
+} else {
+    secrets = {
+        jwt_secret: crypto.randomBytes(64).toString('hex'),
+        encryption_key: crypto.randomBytes(32).toString('hex')
+    };
+    fs.writeFileSync(SECRETS_PATH, JSON.stringify(secrets, null, 2));
+}
+
+const JWT_SECRET = process.env.JWT_SECRET || secrets.jwt_secret;
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || secrets.encryption_key;
 
 app.use(helmet({
     contentSecurityPolicy: {
