@@ -3,107 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zypher Admin Panel</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Zypher Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
     <style>
-        .admin-container {
-            max-width: 1400px;
-            margin: 100px auto;
-            padding: 20px;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        .admin-header h1 {
-            color: var(--primary);
-            font-size: 36px;
-        }
-
-        .admin-section {
-            background: var(--bg-card);
-            padding: 30px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            margin-bottom: 30px;
-        }
-
-        .admin-section h2 {
-            color: var(--primary);
-            margin-bottom: 20px;
-        }
-
-        .admin-form {
-            display: grid;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .admin-form input, .admin-form textarea,
-        .tier-row input {
-            padding: 12px;
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 16px;
-        }
-
-        .admin-form button,
-        .tier-row button,
-        #tiersContainer + button,
-        .admin-section > button {
-            padding: 12px 24px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .badge {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background: rgba(34, 197, 94, 0.2);
-            color: #22c55e;
-        }
-
-        .badge-pending {
-            background: rgba(234, 88, 12, 0.2);
-            color: #ea580c;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0f0a1a; color: #e0d0f0; }
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(135deg, #0f0a1a 0%, #1a1028 50%, #0f0a1a 100%); }
+        nav { position: fixed; top: 0; width: 100%; padding: 20px 50px; background: rgba(15,10,26,0.95); backdrop-filter: blur(10px); z-index: 1000; border-bottom: 1px solid #3a2a5a; }
+        .nav-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 28px; font-weight: bold; color: #a78bfa; text-decoration: none; }
+        .logo::before { content: "\25C6 "; }
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-links a { color: #e0d0f0; text-decoration: none; font-weight: 500; }
+        .nav-links a:hover { color: #a78bfa; }
+        .container { max-width: 1200px; margin: 100px auto 40px; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .header h1 { color: #a78bfa; font-size: 36px; }
+        .btn { padding: 12px 24px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s; text-decoration: none; display: inline-block; }
+        .btn-primary { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(124,58,237,0.4); }
+        .btn-outline { background: transparent; color: #a78bfa; border: 2px solid #a78bfa; }
+        .btn-outline:hover { background: #a78bfa; color: white; }
+        .btn-danger { background: #dc2626; color: white; padding: 10px 16px; font-size: 14px; }
+        .btn-danger:hover { background: #b91c1c; }
+        .section { background: #1a1028; padding: 30px; border-radius: 12px; border: 1px solid #3a2a5a; margin-bottom: 30px; }
+        .section h2 { color: #a78bfa; margin-bottom: 20px; font-size: 24px; }
+        .section h3 { color: #a78bfa; margin: 20px 0 15px; font-size: 18px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #c0b0e0; font-size: 14px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; background: #0f0a1a; border: 1px solid #3a2a5a; border-radius: 8px; color: #e0d0f0; font-size: 16px; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #a78bfa; }
+        .tier-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: end; }
+        .tier-row .form-group { margin-bottom: 0; }
+        .tier-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; }
+        .alert-success { background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #22c55e; }
+        .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
+        .hidden { display: none !important; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #3a2a5a; }
+        th { color: #a78bfa; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+        td { color: #e0d0f0; font-size: 14px; }
+        .badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .badge-active { background: rgba(34,197,94,0.2); color: #22c55e; }
+        .badge-used { background: rgba(234,88,12,0.2); color: #ea580c; }
+        .empty { text-align: center; padding: 40px; color: #c0b0e0; }
+        .product-item { background: #0f0a1a; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #3a2a5a; }
+        .product-item h4 { color: #a78bfa; margin-bottom: 5px; }
+        .product-item p { color: #c0b0e0; font-size: 14px; margin-bottom: 10px; }
+        .tier-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+        .tier-tag { background: rgba(167,139,250,0.1); padding: 4px 12px; border-radius: 6px; font-size: 12px; color: #a78bfa; }
     </style>
 </head>
 <body>
     <div class="bg-animation"></div>
-
     <nav>
         <div class="nav-container">
             <a href="/" class="logo">Zypher</a>
@@ -113,186 +66,141 @@
             </ul>
         </div>
     </nav>
-
-    <div class="admin-container">
-        <div class="admin-header">
+    <div class="container">
+        <div class="header">
             <h1>Admin Panel</h1>
-            <a href="/" class="btn btn-secondary">View Website</a>
+            <a href="/" class="btn btn-outline">View Website</a>
         </div>
-
-        <div class="admin-section">
+        <div id="alert" class="alert hidden"></div>
+        <div class="section">
             <h2>Add New Product</h2>
-            <div class="admin-form">
-                <input type="text" id="productName" placeholder="Product Name">
-                <textarea id="productDesc" placeholder="Product Description" rows="3"></textarea>
+            <div class="form-group">
+                <label>Product Name</label>
+                <input type="text" id="pName" placeholder="e.g., Zypher Loader">
             </div>
-
-            <h3 style="color: var(--primary); margin-top: 20px;">Pricing Tiers</h3>
-            <div id="tiersContainer">
-                <div class="tier-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px;">
-                    <input type="text" class="tier-name" placeholder="Tier Name (e.g., 1 Month Key)">
-                    <input type="number" class="tier-price" placeholder="Price (USD)" step="0.01">
-                    <input type="number" class="tier-duration" placeholder="Days (0=lifetime)">
-                    <button class="btn-remove-tier" onclick="removeTier(this)" style="background: #dc2626;">Remove</button>
-                </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="pDesc" placeholder="Describe your product..." rows="3"></textarea>
             </div>
-            <button onclick="addTier()" style="background: var(--secondary); margin-bottom: 20px;">+ Add Tier</button>
-            <br>
-            <button onclick="addProduct()" style="background: var(--primary);">Add Product</button>
+            <h3>Pricing Tiers</h3>
+            <div id="tiers"></div>
+            <div class="tier-actions">
+                <button class="btn btn-outline" onclick="addTier()">+ Add Tier</button>
+                <button class="btn btn-primary" onclick="addProduct()">Add Product</button>
+            </div>
         </div>
-
-        <div class="admin-section">
+        <div class="section">
+            <h2>Products</h2>
+            <div id="productsList"><div class="empty">No products yet</div></div>
+        </div>
+        <div class="section">
             <h2>Recent Orders</h2>
-            <table id="ordersTable">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Email</th>
-                        <th>Product</th>
-                        <th>Amount</th>
-                        <th>License Key</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <table><thead><tr><th>Order ID</th><th>Email</th><th>Product</th><th>Tier</th><th>Amount</th><th>Key</th><th>Date</th></tr></thead><tbody id="ordersBody"></tbody></table>
         </div>
-
-        <div class="admin-section">
+        <div class="section">
             <h2>License Keys</h2>
-            <table id="keysTable">
-                <thead>
-                    <tr>
-                        <th>Key</th>
-                        <th>Product</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <table><thead><tr><th>Key</th><th>Product</th><th>Tier</th><th>Email</th><th>Expires</th><th>Status</th><th>Created</th></tr></thead><tbody id="keysBody"></tbody></table>
         </div>
     </div>
-
     <script>
+        function showAlert(msg, type) {
+            var el = document.getElementById('alert');
+            el.textContent = msg;
+            el.className = 'alert alert-' + type;
+            setTimeout(function() { el.className = 'alert hidden'; }, 5000);
+        }
+
         function addTier() {
-            const container = document.getElementById('tiersContainer');
-            const tierRow = document.createElement('div');
-            tierRow.className = 'tier-row';
-            tierRow.style.cssText = 'display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px;';
-            tierRow.innerHTML = `
-                <input type="text" class="tier-name" placeholder="Tier Name (e.g., 1 Month Key)">
-                <input type="number" class="tier-price" placeholder="Price (USD)" step="0.01">
-                <input type="number" class="tier-duration" placeholder="Days (0=lifetime)">
-                <button class="btn-remove-tier" onclick="removeTier(this)" style="background: #dc2626;">Remove</button>
-            `;
-            container.appendChild(tierRow);
+            var container = document.getElementById('tiers');
+            var row = document.createElement('div');
+            row.className = 'tier-row';
+            row.innerHTML = '<div class="form-group"><label>Tier Name</label><input type="text" class="tier-name" placeholder="e.g., 1 Month Key"></div>' +
+                '<div class="form-group"><label>Price (USD)</label><input type="number" class="tier-price" placeholder="29.99" step="0.01"></div>' +
+                '<div class="form-group"><label>Duration (days)</label><input type="number" class="tier-duration" placeholder="30 (0=lifetime)"></div>' +
+                '<button class="btn btn-danger" onclick="this.parentElement.remove()">Remove</button>';
+            container.appendChild(row);
         }
 
-        function removeTier(btn) {
-            btn.parentElement.remove();
-        }
+        function addProduct() {
+            var name = document.getElementById('pName').value.trim();
+            var desc = document.getElementById('pDesc').value.trim();
+            if (!name || !desc) { showAlert('Name and description required', 'error'); return; }
 
-        async function addProduct() {
-            const name = document.getElementById('productName').value;
-            const description = document.getElementById('productDesc').value;
-
-            if (!name || !description) {
-                alert('Please fill in name and description');
-                return;
-            }
-
-            const tierRows = document.querySelectorAll('.tier-row');
-            const tiers = [];
-
-            tierRows.forEach(row => {
-                const tierName = row.querySelector('.tier-name').value;
-                const tierPrice = row.querySelector('.tier-price').value;
-                const tierDuration = row.querySelector('.tier-duration').value;
-
-                if (tierName && tierPrice) {
-                    tiers.push({
-                        name: tierName,
-                        price: parseFloat(tierPrice),
-                        duration_days: parseInt(tierDuration) || 0
-                    });
+            var rows = document.querySelectorAll('.tier-row');
+            var tiers = [];
+            rows.forEach(function(row) {
+                var tName = row.querySelector('.tier-name').value.trim();
+                var tPrice = row.querySelector('.tier-price').value;
+                var tDur = row.querySelector('.tier-duration').value;
+                if (tName && tPrice) {
+                    tiers.push({ name: tName, price: parseFloat(tPrice), duration_days: parseInt(tDur) || 0 });
                 }
             });
 
-            if (tiers.length === 0) {
-                alert('Please add at least one pricing tier');
-                return;
-            }
+            if (tiers.length === 0) { showAlert('Add at least one tier', 'error'); return; }
 
-            try {
-                const response = await fetch('/api/admin/products', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, description, tiers })
-                });
-
-                console.log('Response status:', response.status);
-
-                if (response.ok) {
-                    alert('Product added successfully!');
-                    document.getElementById('productName').value = '';
-                    document.getElementById('productDesc').value = '';
-                    document.getElementById('tiersContainer').innerHTML = '';
+            fetch('/api/admin/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, description: desc, tiers: tiers })
+            }).then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.id) {
+                    showAlert('Product added!', 'success');
+                    document.getElementById('pName').value = '';
+                    document.getElementById('pDesc').value = '';
+                    document.getElementById('tiers').innerHTML = '';
                     addTier();
+                    loadProducts();
                 } else {
-                    const error = await response.json();
-                    console.error('Server error:', error);
-                    alert('Failed to add product: ' + (error.error || response.statusText));
+                    showAlert('Failed: ' + (data.error || 'Unknown error'), 'error');
                 }
-            } catch (error) {
-                console.error('Fetch error:', error);
-                alert('Failed to add product: ' + error.message);
-            }
+            }).catch(function(err) {
+                showAlert('Error: ' + err.message, 'error');
+            });
         }
 
-        async function loadOrders() {
-            try {
-                const response = await fetch('/api/admin/orders');
-                const orders = await response.json();
-                const tbody = document.querySelector('#ordersTable tbody');
-
-                tbody.innerHTML = orders.map(order => `
-                    <tr>
-                        <td style="font-family: monospace; font-size: 12px;">${order.id.substring(0, 20)}...</td>
-                        <td>${order.email}</td>
-                        <td>${order.product_name}</td>
-                        <td>$${(order.amount / 100).toFixed(2)}</td>
-                        <td style="font-family: monospace; font-size: 12px;">${order.license_key}</td>
-                        <td>${new Date(order.created_at).toLocaleString()}</td>
-                    </tr>
-                `).join('');
-            } catch (error) {
-                console.error('Failed to load orders:', error);
-            }
+        function loadProducts() {
+            fetch('/api/products').then(function(res) { return res.json(); })
+            .then(function(products) {
+                var el = document.getElementById('productsList');
+                if (products.length === 0) { el.innerHTML = '<div class="empty">No products yet</div>'; return; }
+                el.innerHTML = products.map(function(p) {
+                    var tags = p.tiers.map(function(t) {
+                        return '<span class="tier-tag">' + t.name + ' - $' + t.price.toFixed(2) + (t.duration_days ? ' (' + t.duration_days + 'd)' : ' (lifetime)') + '</span>';
+                    }).join('');
+                    return '<div class="product-item"><h4>' + p.name + '</h4><p>' + p.description + '</p><div class="tier-tags">' + tags + '</div></div>';
+                }).join('');
+            });
         }
 
-        async function loadKeys() {
-            try {
-                const response = await fetch('/api/admin/keys');
-                const keys = await response.json();
-                const tbody = document.querySelector('#keysTable tbody');
-
-                tbody.innerHTML = keys.map(key => `
-                    <tr>
-                        <td style="font-family: monospace; font-size: 12px;">${key.key}</td>
-                        <td>${key.product_id}</td>
-                        <td>${key.email}</td>
-                        <td><span class="badge ${key.used ? 'badge-pending' : 'badge-success'}">${key.used ? 'Used' : 'Unused'}</span></td>
-                        <td>${new Date(key.created_at).toLocaleString()}</td>
-                    </tr>
-                `).join('');
-            } catch (error) {
-                console.error('Failed to load keys:', error);
-            }
+        function loadOrders() {
+            fetch('/api/admin/orders').then(function(res) { return res.json(); })
+            .then(function(orders) {
+                var tbody = document.getElementById('ordersBody');
+                if (orders.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No orders yet</td></tr>'; return; }
+                tbody.innerHTML = orders.map(function(o) {
+                    return '<tr><td style="font-family:monospace;font-size:11px;">' + o.id.substring(0,16) + '...</td><td>' + o.email + '</td><td>' + o.product_name + '</td><td>' + (o.tier_name||'-') + '</td><td>$' + (o.amount/100).toFixed(2) + '</td><td style="font-family:monospace;font-size:11px;">' + o.license_key + '</td><td>' + new Date(o.created_at).toLocaleDateString() + '</td></tr>';
+                }).join('');
+            });
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        function loadKeys() {
+            fetch('/api/admin/keys').then(function(res) { return res.json(); })
+            .then(function(keys) {
+                var tbody = document.getElementById('keysBody');
+                if (keys.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No keys yet</td></tr>'; return; }
+                tbody.innerHTML = keys.map(function(k) {
+                    var exp = k.expires_at ? new Date(k.expires_at).toLocaleDateString() : 'Lifetime';
+                    var badge = k.used ? '<span class="badge badge-used">Used</span>' : '<span class="badge badge-active">Unused</span>';
+                    return '<tr><td style="font-family:monospace;font-size:11px;">' + k.key + '</td><td>' + k.product_id + '</td><td>' + (k.tier_name||'-') + '</td><td>' + k.email + '</td><td>' + exp + '</td><td>' + badge + '</td><td>' + new Date(k.created_at).toLocaleDateString() + '</td></tr>';
+                }).join('');
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            addTier();
+            loadProducts();
             loadOrders();
             loadKeys();
         });
