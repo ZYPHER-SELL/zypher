@@ -3,89 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zypher - Premium Software Solutions</title>
+    <title>Zypher - Premium Gaming Solutions</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="bg-animation"></div>
+    <div class="bg-grid"></div>
+    <div class="bg-particles"></div>
 
     <nav>
         <div class="nav-container">
             <a href="#" class="logo">Zypher</a>
             <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
+                <li><a href="#home">Home</a></li>
                 <li><a href="#products">Products</a></li>
-                <li><a href="#stats">About</a></li>
-                <li><a href="#" onclick="openModal('contact')">Contact</a></li>
-                <li id="navAuthLink"><a href="#" onclick="openModal('login')">Login</a></li>
+                <li><a href="#reviews">Reviews</a></li>
+                <li><a href="#status">Status</a></li>
             </ul>
+            <div class="nav-actions">
+                <button class="btn-ghost" onclick="openModal('login')">Login</button>
+                <a href="#" class="btn-discord">Discord</a>
+            </div>
         </div>
     </nav>
 
-    <section class="hero">
+    <section id="home" class="hero">
         <div class="hero-content">
-            <h1>The Future of Software</h1>
-            <p>Premium tools designed for professionals. Secure, reliable, and built to perform.</p>
-            <div class="cta-buttons">
-                <a href="#products" class="btn btn-primary">View Products</a>
-                <a href="#features" class="btn btn-secondary">Learn More</a>
+            <h1>Unlock Your Skills With The BEST Cheats And Sources</h1>
+            <p>Welcome to Zypher, your ultimate destination for unleashing the full potential of your Gaming Skills! Unlock your cutting-edge Gaming Skills With Our Cheating services, designed to elevate your Gaming experience to new heights.</p>
+            <div class="hero-buttons">
+                <a href="#products" class="btn-primary">
+                    <span>Shop Now</span>
+                    <span>→</span>
+                </a>
+                <a href="#" class="btn-secondary">Join Discord</a>
             </div>
-        </div>
-    </section>
-
-    <section id="features" class="features">
-        <h2 class="section-title">Why Choose Zypher?</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <span class="feature-icon">🔒</span>
-                <h3>Secure & Private</h3>
-                <p>Industry-leading security with HWID locking, encrypted communications, and anti-tamper protection.</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">⚡</span>
-                <h3>Lightning Fast</h3>
-                <p>Optimized performance with minimal overhead. Built for speed and efficiency.</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🎯</span>
-                <h3>Precision Engineered</h3>
-                <p>Every feature carefully crafted to deliver the best experience possible.</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🛡️</span>
-                <h3>Reliable & Stable</h3>
-                <p>Battle-tested code that works when you need it. 99.9% uptime guaranteed.</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🔄</span>
-                <h3>Auto Updates</h3>
-                <p>Always stay up to date with automatic updates delivered seamlessly.</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">💬</span>
-                <h3>24/7 Support</h3>
-                <p>Our team is always here to help. Get support whenever you need it.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="stats" class="stats">
-        <div class="stats-grid">
-            <div class="stat-item">
-                <h3>10K+</h3>
-                <p>Active Users</p>
-            </div>
-            <div class="stat-item">
-                <h3>99.9%</h3>
-                <p>Uptime</p>
-            </div>
-            <div class="stat-item">
-                <h3>24/7</h3>
-                <p>Support</p>
-            </div>
-            <div class="stat-item">
-                <h3>5★</h3>
-                <p>Rating</p>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-value">2000+</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">100+</div>
+                    <div class="stat-label">Happy Customers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">&lt;5m</div>
+                    <div class="stat-label">Response Time</div>
+                </div>
             </div>
         </div>
     </section>
@@ -93,7 +57,55 @@
     <section id="products" class="products">
         <h2 class="section-title">Our Products</h2>
         <div class="products-grid" id="productsGrid">
-            <!-- Products will be loaded here -->
+            <!-- Products loaded dynamically -->
+        </div>
+    </section>
+
+    <section id="reviews" class="reviews">
+        <h2 class="section-title">Customer Reviews</h2>
+        <div class="reviews-grid">
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">Best cheat provider I've ever used. Undetected for months!</p>
+                <div class="review-author">- ProGamer123</div>
+            </div>
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">Amazing support and instant delivery. Highly recommend!</p>
+                <div class="review-author">- ElitePlayer</div>
+            </div>
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">The HWID spoofer works perfectly. No bans since I started using it.</p>
+                <div class="review-author">- StealthHacker</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="status" class="status">
+        <h2 class="section-title">Service Status</h2>
+        <div class="status-grid">
+            <div class="status-item">
+                <div class="status-dot online"></div>
+                <div class="status-info">
+                    <div class="status-name">Zypher Loader</div>
+                    <div class="status-desc">All systems operational</div>
+                </div>
+            </div>
+            <div class="status-item">
+                <div class="status-dot online"></div>
+                <div class="status-info">
+                    <div class="status-name">HWID Spoofer</div>
+                    <div class="status-desc">All systems operational</div>
+                </div>
+            </div>
+            <div class="status-item">
+                <div class="status-dot online"></div>
+                <div class="status-info">
+                    <div class="status-name">Authentication Server</div>
+                    <div class="status-desc">All systems operational</div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -110,73 +122,6 @@
             </div>
         </div>
     </footer>
-
-    <!-- Purchase Modal -->
-    <div id="purchaseModal" class="modal">
-        <div class="modal-content">
-            <h2>Complete Your Purchase</h2>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="buyerEmail" placeholder="your@email.com">
-            </div>
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="completePurchase()">Proceed to Payment</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Product Detail Modal -->
-    <div id="productDetailModal" class="modal">
-        <div class="modal-content product-detail-modal">
-            <button class="modal-close" onclick="closeProductDetail()">×</button>
-            <div class="product-detail-header">
-                <div class="product-detail-image">
-                    <div class="product-image-placeholder large">
-                        <span class="product-icon">⚡</span>
-                    </div>
-                </div>
-                <div class="product-detail-info">
-                    <h2 id="detailProductName">Product Name</h2>
-                    <p id="detailProductDesc" class="product-detail-desc">Description</p>
-                </div>
-            </div>
-
-            <div class="product-detail-section">
-                <h3>System Requirements</h3>
-                <div id="detailSysReq" class="sys-req-container"></div>
-            </div>
-
-            <div class="product-detail-section">
-                <h3>Select Plan</h3>
-                <div id="detailTiers" class="tiers-grid"></div>
-            </div>
-
-            <div class="product-detail-actions">
-                <button class="btn btn-cancel" onclick="closeProductDetail()">Cancel</button>
-                <button class="btn btn-primary" onclick="openPurchaseModal()">Buy Now</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Contact Modal -->
-    <div id="contactModal" class="modal">
-        <div class="modal-content">
-            <h2>Contact Us</h2>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="contactEmail" placeholder="your@email.com">
-            </div>
-            <div class="form-group">
-                <label>Message</label>
-                <input type="text" id="contactMessage" placeholder="How can we help?">
-            </div>
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="sendContact()">Send Message</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Login Modal -->
     <div id="loginModal" class="modal">
@@ -221,6 +166,80 @@
                 <button class="btn btn-primary" onclick="doUserRegister()">Register</button>
             </div>
             <p class="auth-switch">Already have an account? <a href="#" onclick="switchToLogin()">Login</a></p>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <h2>Contact Us</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="contactEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <input type="text" id="contactMessage" placeholder="How can we help?">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="sendContact()">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productDetailModal" class="modal">
+        <div class="modal-content product-detail-modal">
+            <button class="modal-close" onclick="closeProductDetail()">×</button>
+            <div class="product-detail-header">
+                <div class="product-detail-image">
+                    <div class="product-box-art">
+                        <div class="box-art-front">
+                            <span class="product-icon">⚡</span>
+                            <h3 id="detailProductName">Product</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-detail-info">
+                    <h2 id="detailProductName2">Product Name</h2>
+                    <p id="detailProductDesc" class="product-detail-desc">Description</p>
+                    <div class="product-stock-status">
+                        <span class="stock-dot"></span>
+                        <span>In Stock</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-detail-section">
+                <h3>System Requirements</h3>
+                <div id="detailSysReq" class="sys-req-container"></div>
+            </div>
+
+            <div class="product-detail-section">
+                <h3>Select Plan</h3>
+                <div id="detailTiers" class="tiers-grid"></div>
+            </div>
+
+            <div class="product-detail-actions">
+                <button class="btn-cancel" onclick="closeProductDetail()">Cancel</button>
+                <button class="btn btn-primary" onclick="openPurchaseModal()">Buy Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Modal -->
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content">
+            <h2>Complete Your Purchase</h2>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="buyerEmail" placeholder="your@email.com">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="completePurchase()">Proceed to Payment</button>
+            </div>
         </div>
     </div>
 
