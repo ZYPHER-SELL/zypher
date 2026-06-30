@@ -540,6 +540,8 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
+            console.log('Login attempt:', username);
+
             if (!username || !password) {
                 showLoginError('Please enter username and password');
                 return;
@@ -552,17 +554,23 @@
                     body: JSON.stringify({ username, password })
                 });
 
+                console.log('Login response status:', res.status);
+
                 const data = await res.json();
+                console.log('Login response data:', data);
 
                 if (res.ok) {
                     authToken = data.token;
                     localStorage.setItem('zypher_auth_token', authToken);
+                    console.log('Token saved, showing dashboard');
                     showDashboard();
                 } else {
+                    console.error('Login failed:', data.error);
                     showLoginError(data.error || 'Login failed');
                 }
             } catch (e) {
-                showLoginError('Cannot connect to server. Make sure auth server is running on port 3000');
+                console.error('Login error:', e);
+                showLoginError('Cannot connect to server: ' + e.message);
             }
         }
 
@@ -570,7 +578,6 @@
             const el = document.getElementById('loginError');
             el.textContent = msg;
             el.classList.remove('hidden');
-            setTimeout(() => el.classList.add('hidden'), 5000);
         }
 
         function logout() {
