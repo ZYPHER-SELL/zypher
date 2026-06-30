@@ -215,29 +215,37 @@ app.get('/api/products', (req, res) => {
 
 // Admin: Add product
 app.post('/api/admin/products', (req, res) => {
-    const { name, description, tiers } = req.body;
+    try {
+        console.log('Received product creation request:', req.body);
 
-    if (!name || !description || !tiers || !Array.isArray(tiers) || tiers.length === 0) {
-        return res.status(400).json({ error: 'Name, description, and at least one tier required' });
+        const { name, description, tiers } = req.body;
+
+        if (!name || !description || !tiers || !Array.isArray(tiers) || tiers.length === 0) {
+            return res.status(400).json({ error: 'Name, description, and at least one tier required' });
+        }
+
+        const product = {
+            id: crypto.randomBytes(8).toString('hex'),
+            name,
+            description,
+            tiers: tiers.map(t => ({
+                id: crypto.randomBytes(4).toString('hex'),
+                name: t.name,
+                price: parseFloat(t.price),
+                duration_days: parseInt(t.duration_days) || null
+            })),
+            created_at: new Date().toISOString()
+        };
+
+        db.products.push(product);
+        saveDB();
+
+        console.log('Product created:', product);
+        res.json(product);
+    } catch (error) {
+        console.error('Error creating product:', error);
+        res.status(500).json({ error: 'Internal server error: ' + error.message });
     }
-
-    const product = {
-        id: crypto.randomBytes(8).toString('hex'),
-        name,
-        description,
-        tiers: tiers.map(t => ({
-            id: crypto.randomBytes(4).toString('hex'),
-            name: t.name,
-            price: parseFloat(t.price),
-            duration_days: parseInt(t.duration_days) || null
-        })),
-        created_at: new Date().toISOString()
-    };
-
-    db.products.push(product);
-    saveDB();
-
-    res.json(product);
 });
 
 // Admin: Get orders
