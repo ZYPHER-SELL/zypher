@@ -22,19 +22,22 @@ app.get('/js/*', (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, req.path));
 });
 
-const DB_PATH = path.join(__dirname, 'db.json');
+const DB_PATH = process.env.VERCEL ? '/tmp/db.json' : path.join(__dirname, 'db.json');
 let db = { products: [], orders: [], license_keys: [] };
 
 function loadDB() {
     if (fs.existsSync(DB_PATH)) {
-        db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+        try { db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8')); } catch(e) {}
+    } else if (fs.existsSync(path.join(__dirname, 'db.json'))) {
+        try { db = JSON.parse(fs.readFileSync(path.join(__dirname, 'db.json'), 'utf8')); } catch(e) {}
+        saveDB();
     } else {
         saveDB();
     }
 }
 
 function saveDB() {
-    fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+    try { fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2)); } catch(e) { console.error('DB write failed:', e.message); }
 }
 
 loadDB();

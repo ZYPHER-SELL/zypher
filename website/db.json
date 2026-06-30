@@ -1,5 +1,18 @@
 {
-  "products": [],
+  "products": [
+    {
+      "id": "zypher-loader-001",
+      "name": "Zypher Loader",
+      "description": "Multi-game cheat loader with HWID locking, auto-updates, and premium support",
+      "tiers": [
+        { "id": "tier-3day", "name": "3 Day Key", "price": 15, "duration_days": 3 },
+        { "id": "tier-1week", "name": "1 Week Key", "price": 25, "duration_days": 7 },
+        { "id": "tier-1month", "name": "1 Month Key", "price": 45, "duration_days": 30 },
+        { "id": "tier-lifetime", "name": "Lifetime Key", "price": 100, "duration_days": 0 }
+      ],
+      "created_at": "2026-06-30T07:00:00.000Z"
+    }
+  ],
   "orders": [],
   "license_keys": []
 }
