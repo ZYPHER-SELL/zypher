@@ -267,29 +267,41 @@ app.get('/api/admin/stats', adminAuth, (req, res) => {
     });
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.post('/api/admin/change-password', adminAuth, (req, res) => {
+    const { current_password, new_password } = req.body;
 
-const DEFAULT_ADMIN_PASSWORD = 'admin123';
+    if (!current_password || !new_password) {
+        return res.status(400).json({ error: 'Missing fields' });
+    }
+
+    if (new_password.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    const admin = db.admins.find(a => a.username === req.admin.username);
+
+    if (!admin || !bcrypt.compareSync(current_password, admin.password_hash)) {
+        return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
+    admin.password_hash = bcrypt.hashSync(new_password, 10);
+    saveDB();
+
+    res.json({ success: true });
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 if (db.admins.length === 0) {
     db.admins.push({
         username: 'admin',
-        password_hash: bcrypt.hashSync(DEFAULT_ADMIN_PASSWORD, 10),
+        password_hash: bcrypt.hashSync('admin123', 10),
         created_at: new Date().toISOString()
     });
     saveDB();
-} else {
-    const admin = db.admins.find(a => a.username === 'admin');
-    if (admin && !bcrypt.compareSync(DEFAULT_ADMIN_PASSWORD, admin.password_hash)) {
-        admin.password_hash = bcrypt.hashSync(DEFAULT_ADMIN_PASSWORD, 10);
-        saveDB();
-        console.log('Admin password was incorrect - reset to default');
-    }
 }
 
 app.listen(PORT, () => {
     console.log(`Zypher Auth Server running on port ${PORT}`);
-    console.log(`Admin credentials: admin / ${DEFAULT_ADMIN_PASSWORD}`);
-    console.log(`Change these immediately!`);
     console.log(`Dashboard: http://localhost:${PORT}`);
 });

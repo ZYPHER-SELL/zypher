@@ -510,6 +510,7 @@
                 <h2>Change Admin Password</h2>
                 <div id="passwordAlert" class="alert hidden"></div>
                 <div class="generate-form">
+                    <input type="password" id="currentPassword" placeholder="Current Password">
                     <input type="password" id="newPassword" placeholder="New Password">
                     <input type="password" id="confirmPassword" placeholder="Confirm Password">
                     <button class="btn" onclick="changePassword()">Update Password</button>
@@ -741,11 +742,12 @@
         }
 
         async function changePassword() {
+            const currentPass = document.getElementById('currentPassword').value;
             const newPass = document.getElementById('newPassword').value;
             const confirmPass = document.getElementById('confirmPassword').value;
 
-            if (!newPass || !confirmPass) {
-                showPasswordAlert('Please fill in both fields', 'error');
+            if (!currentPass || !newPass || !confirmPass) {
+                showPasswordAlert('Please fill in all fields', 'error');
                 return;
             }
 
@@ -759,8 +761,32 @@
                 return;
             }
 
-            // Note: This would need a backend endpoint to actually change password
-            showPasswordAlert('Password change feature coming soon. For now, edit the database file directly.', 'success');
+            try {
+                const res = await fetch('/api/admin/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        current_password: currentPass,
+                        new_password: newPass
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    showPasswordAlert('Password changed successfully!', 'success');
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    showPasswordAlert(data.error || 'Failed to change password', 'error');
+                }
+            } catch (e) {
+                showPasswordAlert('Failed to change password', 'error');
+            }
         }
 
         function showPasswordAlert(msg, type) {
