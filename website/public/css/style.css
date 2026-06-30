@@ -346,6 +346,46 @@ nav {
     box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
 }
 
+.tier-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tier-option {
+    padding: 12px;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.tier-option:hover {
+    border-color: var(--primary);
+    background: rgba(167, 139, 250, 0.1);
+}
+
+.tier-option.selected {
+    border-color: var(--primary);
+    background: rgba(167, 139, 250, 0.2);
+}
+
+.tier-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.tier-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--primary);
+}
+
 /* Stats Section */
 .stats {
     padding: 80px 20px;

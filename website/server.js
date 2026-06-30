@@ -97,11 +97,16 @@ async function sendReceiptEmail(email, orderId, productName, licenseKey, amount)
 // Checkout endpoint
 app.post('/api/checkout', async (req, res) => {
     try {
-        const { email, productId } = req.body;
+        const { email, productId, tierId } = req.body;
 
         const product = db.products.find(p => p.id === productId);
         if (!product) {
             return res.status(404).json({ error: 'Product not found' });
+        }
+
+        const tier = product.tiers.find(t => t.id === tierId);
+        if (!tier) {
+            return res.status(404).json({ error: 'Pricing tier not found' });
         }
 
         const session = await stripe.checkout.sessions.create({
@@ -110,10 +115,10 @@ app.post('/api/checkout', async (req, res) => {
                 price_data: {
                     currency: 'usd',
                     product_data: {
-                        name: product.name,
+                        name: `${product.name} - ${tier.name}`,
                         description: product.description
                     },
-                    unit_amount: product.price * 100,
+                    unit_amount: tier.price * 100,
                 },
                 quantity: 1,
             }],
@@ -123,6 +128,9 @@ app.post('/api/checkout', async (req, res) => {
             customer_email: email,
             metadata: {
                 productId: productId,
+                tierId: tierId,
+                tierName: tier.name,
+                durationDays: tier.duration_days || 0,
                 email: email
             }
         });
@@ -150,18 +158,29 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
         const session = event.data.object;
 
         const productId = session.metadata.productId;
+        const tierId = session.metadata.tierId;
+        const tierName = session.metadata.tierName;
+        const durationDays = parseInt(session.metadata.durationDays) || 0;
         const email = session.metadata.email;
         const product = db.products.find(p => p.id === productId);
 
         if (product) {
             const licenseKey = generateLicenseKey();
 
+            let expiresAt = null;
+            if (durationDays > 0) {
+                expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+            }
+
             db.license_keys.push({
                 key: licenseKey,
                 product_id: productId,
+                tier_id: tierId,
+                tier_name: tierName,
                 email: email,
                 order_id: session.id,
                 created_at: new Date().toISOString(),
+                expires_at: expiresAt,
                 used: false
             });
 
@@ -170,6 +189,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
                 email: email,
                 product_id: productId,
                 product_name: product.name,
+                tier_name: tierName,
                 amount: session.amount_total,
                 license_key: licenseKey,
                 created_at: new Date().toISOString()
@@ -195,13 +215,22 @@ app.get('/api/products', (req, res) => {
 
 // Admin: Add product
 app.post('/api/admin/products', (req, res) => {
-    const { name, description, price } = req.body;
+    const { name, description, tiers } = req.body;
+
+    if (!name || !description || !tiers || !Array.isArray(tiers) || tiers.length === 0) {
+        return res.status(400).json({ error: 'Name, description, and at least one tier required' });
+    }
 
     const product = {
         id: crypto.randomBytes(8).toString('hex'),
         name,
         description,
-        price: parseFloat(price),
+        tiers: tiers.map(t => ({
+            id: crypto.randomBytes(4).toString('hex'),
+            name: t.name,
+            price: parseFloat(t.price),
+            duration_days: parseInt(t.duration_days) || null
+        })),
         created_at: new Date().toISOString()
     };
 

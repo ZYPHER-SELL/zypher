@@ -1,4 +1,5 @@
 let selectedProduct = null;
+let selectedTier = null;
 
 async function loadProducts() {
     try {
@@ -21,17 +22,18 @@ async function loadProducts() {
             <div class="product-card">
                 <div class="product-header">
                     <div class="product-name">${product.name}</div>
-                    <div class="product-price">$${product.price}<span>/lifetime</span></div>
                 </div>
                 <div class="product-body">
-                    <ul class="product-features">
-                        <li>Full access to all features</li>
-                        <li>Lifetime updates</li>
-                        <li>Priority support</li>
-                        <li>HWID locking included</li>
-                        <li>Instant delivery</li>
-                    </ul>
-                    <button class="buy-btn" onclick="openPurchaseModal('${product.id}', '${product.name}')">
+                    <p style="color: var(--text-dim); margin-bottom: 20px;">${product.description}</p>
+                    <div class="tier-options">
+                        ${product.tiers.map(tier => `
+                            <div class="tier-option" onclick="selectTier('${product.id}', '${tier.id}', '${tier.name}', ${tier.price})">
+                                <div class="tier-name">${tier.name}</div>
+                                <div class="tier-price">$${tier.price.toFixed(2)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="buy-btn" onclick="openPurchaseModal('${product.id}')">
                         Buy Now
                     </button>
                 </div>
@@ -42,8 +44,19 @@ async function loadProducts() {
     }
 }
 
-function openPurchaseModal(productId, productName) {
-    selectedProduct = { id: productId, name: productName };
+function selectTier(productId, tierId, tierName, price) {
+    selectedTier = { id: tierId, name: tierName, price };
+    document.querySelectorAll('.tier-option').forEach(el => el.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+}
+
+function openPurchaseModal(productId) {
+    if (!selectedTier) {
+        alert('Please select a pricing tier first');
+        return;
+    }
+
+    selectedProduct = { id: productId };
     document.getElementById('purchaseModal').classList.add('active');
 }
 
@@ -65,8 +78,8 @@ async function completePurchase() {
         return;
     }
 
-    if (!selectedProduct) {
-        alert('No product selected');
+    if (!selectedProduct || !selectedTier) {
+        alert('Please select a product and pricing tier');
         return;
     }
 
@@ -78,7 +91,8 @@ async function completePurchase() {
             },
             body: JSON.stringify({
                 email: email,
-                productId: selectedProduct.id
+                productId: selectedProduct.id,
+                tierId: selectedTier.id
             })
         });
 
@@ -87,7 +101,7 @@ async function completePurchase() {
         if (data.url) {
             window.location.href = data.url;
         } else {
-            alert('Checkout failed. Please try again.');
+            alert('Checkout failed: ' + (data.error || 'Please try again.'));
         }
     } catch (error) {
         console.error('Purchase error:', error);

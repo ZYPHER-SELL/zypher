@@ -121,9 +121,20 @@
             <div class="admin-form">
                 <input type="text" id="productName" placeholder="Product Name">
                 <textarea id="productDesc" placeholder="Product Description" rows="3"></textarea>
-                <input type="number" id="productPrice" placeholder="Price (USD)" step="0.01">
-                <button onclick="addProduct()">Add Product</button>
             </div>
+
+            <h3 style="color: var(--primary); margin-top: 20px;">Pricing Tiers</h3>
+            <div id="tiersContainer">
+                <div class="tier-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" class="tier-name" placeholder="Tier Name (e.g., 1 Month Key)">
+                    <input type="number" class="tier-price" placeholder="Price (USD)" step="0.01">
+                    <input type="number" class="tier-duration" placeholder="Days (0=lifetime)">
+                    <button class="btn-remove-tier" onclick="removeTier(this)" style="background: #dc2626;">Remove</button>
+                </div>
+            </div>
+            <button onclick="addTier()" style="background: var(--secondary); margin-bottom: 20px;">+ Add Tier</button>
+            <br>
+            <button onclick="addProduct()" style="background: var(--primary);">Add Product</button>
         </div>
 
         <div class="admin-section">
@@ -161,13 +172,52 @@
     </div>
 
     <script>
+        function addTier() {
+            const container = document.getElementById('tiersContainer');
+            const tierRow = document.createElement('div');
+            tierRow.className = 'tier-row';
+            tierRow.style.cssText = 'display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px;';
+            tierRow.innerHTML = `
+                <input type="text" class="tier-name" placeholder="Tier Name (e.g., 1 Month Key)">
+                <input type="number" class="tier-price" placeholder="Price (USD)" step="0.01">
+                <input type="number" class="tier-duration" placeholder="Days (0=lifetime)">
+                <button class="btn-remove-tier" onclick="removeTier(this)" style="background: #dc2626;">Remove</button>
+            `;
+            container.appendChild(tierRow);
+        }
+
+        function removeTier(btn) {
+            btn.parentElement.remove();
+        }
+
         async function addProduct() {
             const name = document.getElementById('productName').value;
             const description = document.getElementById('productDesc').value;
-            const price = document.getElementById('productPrice').value;
 
-            if (!name || !description || !price) {
-                alert('Please fill in all fields');
+            if (!name || !description) {
+                alert('Please fill in name and description');
+                return;
+            }
+
+            const tierRows = document.querySelectorAll('.tier-row');
+            const tiers = [];
+
+            tierRows.forEach(row => {
+                const tierName = row.querySelector('.tier-name').value;
+                const tierPrice = row.querySelector('.tier-price').value;
+                const tierDuration = row.querySelector('.tier-duration').value;
+
+                if (tierName && tierPrice) {
+                    tiers.push({
+                        name: tierName,
+                        price: parseFloat(tierPrice),
+                        duration_days: parseInt(tierDuration) || 0
+                    });
+                }
+            });
+
+            if (tiers.length === 0) {
+                alert('Please add at least one pricing tier');
                 return;
             }
 
@@ -175,15 +225,18 @@
                 const response = await fetch('/api/admin/products', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, description, price })
+                    body: JSON.stringify({ name, description, tiers })
                 });
 
                 if (response.ok) {
                     alert('Product added successfully!');
                     document.getElementById('productName').value = '';
                     document.getElementById('productDesc').value = '';
-                    document.getElementById('productPrice').value = '';
-                    loadProducts();
+                    document.getElementById('tiersContainer').innerHTML = '';
+                    addTier();
+                } else {
+                    const error = await response.json();
+                    alert('Failed to add product: ' + error.error);
                 }
             } catch (error) {
                 alert('Failed to add product');
