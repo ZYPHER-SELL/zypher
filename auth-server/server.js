@@ -260,18 +260,27 @@ app.get('/api/admin/stats', adminAuth, (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+const DEFAULT_ADMIN_PASSWORD = 'admin123';
+
 if (db.admins.length === 0) {
     db.admins.push({
         username: 'admin',
-        password_hash: bcrypt.hashSync('admin123', 10),
+        password_hash: bcrypt.hashSync(DEFAULT_ADMIN_PASSWORD, 10),
         created_at: new Date().toISOString()
     });
     saveDB();
+} else {
+    const admin = db.admins.find(a => a.username === 'admin');
+    if (admin && !bcrypt.compareSync(DEFAULT_ADMIN_PASSWORD, admin.password_hash)) {
+        admin.password_hash = bcrypt.hashSync(DEFAULT_ADMIN_PASSWORD, 10);
+        saveDB();
+        console.log('Admin password was incorrect - reset to default');
+    }
 }
 
 app.listen(PORT, () => {
     console.log(`Zypher Auth Server running on port ${PORT}`);
-    console.log(`Admin credentials: admin / admin123`);
+    console.log(`Admin credentials: admin / ${DEFAULT_ADMIN_PASSWORD}`);
     console.log(`Change these immediately!`);
     console.log(`Dashboard: http://localhost:${PORT}`);
 });

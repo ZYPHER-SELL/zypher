@@ -3,7 +3,7 @@
   "admins": [
     {
       "username": "admin",
-      "password_hash": "$2a$10$Qu6qaQajPk78mxlcihXRDemS097tFRFBQGYgoD6WPpBvhWsOA3S4e",
+      "password_hash": "$2a$10$QIW5v63LqSJs9eGk.Xa0A.TlTa7a3T/a8q.IuiiweIxBSYrb8UpaG",
       "created_at": "2026-06-30T07:15:42.752Z"
     }
   ],
