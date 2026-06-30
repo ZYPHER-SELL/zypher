@@ -126,6 +126,39 @@
         </div>
     </div>
 
+    <!-- Product Detail Modal -->
+    <div id="productDetailModal" class="modal">
+        <div class="modal-content product-detail-modal">
+            <button class="modal-close" onclick="closeProductDetail()">×</button>
+            <div class="product-detail-header">
+                <div class="product-detail-image">
+                    <div class="product-image-placeholder large">
+                        <span class="product-icon">⚡</span>
+                    </div>
+                </div>
+                <div class="product-detail-info">
+                    <h2 id="detailProductName">Product Name</h2>
+                    <p id="detailProductDesc" class="product-detail-desc">Description</p>
+                </div>
+            </div>
+
+            <div class="product-detail-section">
+                <h3>System Requirements</h3>
+                <div id="detailSysReq" class="sys-req-container"></div>
+            </div>
+
+            <div class="product-detail-section">
+                <h3>Select Plan</h3>
+                <div id="detailTiers" class="tiers-grid"></div>
+            </div>
+
+            <div class="product-detail-actions">
+                <button class="btn btn-cancel" onclick="closeProductDetail()">Cancel</button>
+                <button class="btn btn-primary" onclick="openPurchaseModal()">Buy Now</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Contact Modal -->
     <div id="contactModal" class="modal">
         <div class="modal-content">
