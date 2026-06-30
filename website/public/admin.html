@@ -43,7 +43,8 @@
             margin-bottom: 20px;
         }
 
-        .admin-form input, .admin-form textarea {
+        .admin-form input, .admin-form textarea,
+        .tier-row input {
             padding: 12px;
             background: var(--bg-dark);
             border: 1px solid var(--border);
@@ -52,7 +53,10 @@
             font-size: 16px;
         }
 
-        .admin-form button {
+        .admin-form button,
+        .tier-row button,
+        #tiersContainer + button,
+        .admin-section > button {
             padding: 12px 24px;
             background: var(--primary);
             color: white;
