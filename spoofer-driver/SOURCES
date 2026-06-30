@@ -1,0 +1,15 @@
+TARGETNAME=ZypherSpoofer
+TARGETTYPE=DRIVER
+DRIVERTYPE=WDM
+
+SOURCES=driver.c
+
+INCLUDES=..
+
+TARGETLIBS= \
+    $(DDK_LIB_PATH)\wdmsec.lib \
+    $(DDK_LIB_PATH)\ndis.lib \
+    $(DDK_LIB_PATH)\mountmgr.lib \
+    $(DDK_LIB_PATH)\storport.lib
+
+C_DEFINES=$(C_DEFINES) -DPOOL_NX_OPTIN=1
