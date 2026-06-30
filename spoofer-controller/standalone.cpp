@@ -93,6 +93,9 @@ static bool SpoofAll() {
     req.spoof_wmi = TRUE;
     req.spoof_cpu = TRUE;
     req.spoof_nvme = TRUE;
+    req.spoof_tpm = TRUE;
+    req.spoof_acpi = TRUE;
+    req.hide_driver = TRUE;
 
     DWORD bytes_returned = 0;
     bool ok = DeviceIoControl(g_device, IOCTL_SPOOFER_SPOOF_ALL,
@@ -145,18 +148,21 @@ static void GetStatus() {
         printf("  WMI:      %s\n", status.wmi_spoofed ? "SPOOFED" : "original");
         printf("  CPU:      %s\n", status.cpu_spoofed ? "SPOOFED" : "original");
         printf("  NVMe:     %s\n", status.nvme_spoofed ? "SPOOFED" : "original");
+        printf("  TPM:      %s\n", status.tpm_cleared ? "CLEARED" : "original");
+        printf("  ACPI:     %s\n", status.acpi_patched ? "PATCHED" : "original");
+        printf("  Driver:   %s\n", status.driver_hidden ? "HIDDEN" : "visible");
         printf("  Disk hook: %s\n", status.disk_hooked ? "ACTIVE" : "inactive");
         printf("  Seed:     %llu\n", status.seed);
     }
 }
 
 static void PrintUsage() {
-    printf("Zypher HWID Spoofer - Personal Use\n");
+    printf("Zypher HWID Spoofer - Personal Use (THE BEST)\n");
     printf("\n");
     printf("Usage: zypher-spoofer [command]\n");
     printf("\n");
     printf("Commands:\n");
-    printf("  spoof     - Spoof all HWID vectors (keeps them spoofed)\n");
+    printf("  spoof     - Spoof all HWID vectors (maximum protection)\n");
     printf("  restore   - Restore all original values\n");
     printf("  status    - Show current spoof status\n");
     printf("  unload    - Unload driver and restore\n");
@@ -172,7 +178,7 @@ int wmain(int argc, wchar_t* argv[]) {
     if (_wcsicmp(argv[1], L"spoof") == 0) {
         if (InstallDriver()) {
             SpoofAll();
-            printf("\n[*] HWID is spoofed. Driver stays loaded.\n");
+            printf("\n[*] HWID is spoofed. Driver stays loaded and hidden.\n");
             printf("[*] Run 'zypher-spoofer restore' when done.\n");
         }
     }

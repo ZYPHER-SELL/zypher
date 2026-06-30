@@ -35,6 +35,9 @@ typedef struct _SPOOFER_STATUS {
     BOOLEAN ndis_hooked;
     BOOLEAN cpu_spoofed;
     BOOLEAN nvme_spoofed;
+    BOOLEAN tpm_cleared;
+    BOOLEAN acpi_patched;
+    BOOLEAN driver_hidden;
     ULONG64 seed;
     ULONG adapters_spoofed;
     ULONG disks_hooked;
@@ -53,5 +56,8 @@ typedef struct _SPOOF_REQUEST {
     BOOLEAN spoof_wmi;
     BOOLEAN spoof_cpu;
     BOOLEAN spoof_nvme;
+    BOOLEAN spoof_tpm;
+    BOOLEAN spoof_acpi;
+    BOOLEAN hide_driver;
     BOOLEAN clean_boot;
 } SPOOF_REQUEST, *PSPOOF_REQUEST;

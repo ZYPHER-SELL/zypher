@@ -4,12 +4,17 @@
 #include <mountdev.h>
 #include <mountmgr.h>
 #include <storport.h>
+#include <scsi.h>
+#include <ntddscsi.h>
+#include <ntdddisk.h>
+#include <ntddndis.h>
 #include "ioctl.h"
 
 DRIVER_INITIALIZE DriverEntry;
 
 #define MAX_HOOKED_DISKS 16
 #define MAX_HOOKED_NICS 16
+#define MAX_SMBIOS_ENTRIES 64
 
 typedef struct _DISK_HOOK_ENTRY {
     PDEVICE_OBJECT device_object;
@@ -17,6 +22,8 @@ typedef struct _DISK_HOOK_ENTRY {
     BOOLEAN hooked;
     wchar_t spoofed_serial[32];
     wchar_t spoofed_model[64];
+    wchar_t original_serial[32];
+    wchar_t original_model[64];
 } DISK_HOOK_ENTRY;
 
 typedef struct _NIC_HOOK_ENTRY {
@@ -24,7 +31,15 @@ typedef struct _NIC_HOOK_ENTRY {
     PDRIVER_DISPATCH original_dispatch;
     BOOLEAN hooked;
     BYTE spoofed_mac[6];
+    BYTE original_mac[6];
 } NIC_HOOK_ENTRY;
+
+typedef struct _SMBIOS_ENTRY {
+    PHYSICAL_ADDRESS physical_address;
+    PVOID mapped_address;
+    SIZE_T size;
+    BOOLEAN patched;
+} SMBIOS_ENTRY;
 
 typedef struct _DEVICE_CONTEXT {
     BOOLEAN volume_spoofed;
@@ -40,12 +55,17 @@ typedef struct _DEVICE_CONTEXT {
     BOOLEAN ndis_hooked;
     BOOLEAN cpu_spoofed;
     BOOLEAN nvme_spoofed;
+    BOOLEAN tpm_cleared;
+    BOOLEAN acpi_patched;
+    BOOLEAN driver_hidden;
     ULONG64 random_seed;
     ULONG adapters_spoofed;
     ULONG disks_hooked;
+    ULONG smbios_entries;
 
     DISK_HOOK_ENTRY disk_hooks[MAX_HOOKED_DISKS];
     NIC_HOOK_ENTRY nic_hooks[MAX_HOOKED_NICS];
+    SMBIOS_ENTRY smbios_entries_arr[MAX_SMBIOS_ENTRIES];
 
     wchar_t original_machine_guid[64];
     wchar_t original_product_id[64];
@@ -60,6 +80,10 @@ typedef struct _DEVICE_CONTEXT {
     wchar_t original_cpu_id[64];
     wchar_t original_install_id[64];
     wchar_t original_nvme_serial[64];
+    wchar_t original_tpm_owner[64];
+    
+    LIST_ENTRY hidden_module_list;
+    PKTHREAD original_thread;
 } DEVICE_CONTEXT, *PDEVICE_CONTEXT;
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, GetDeviceContext)
@@ -69,6 +93,8 @@ static const wchar_t* DISK_DEVICE_PATHS[] = {
     L"\\Device\\Harddisk1\\DR1",
     L"\\Device\\Harddisk2\\DR2",
     L"\\Device\\Harddisk3\\DR3",
+    L"\\Device\\Cdrom0",
+    L"\\Device\\Cdrom1",
     NULL
 };
 
@@ -84,12 +110,19 @@ static const wchar_t* VOLUME_DEVICE_PATHS[] = {
 static const wchar_t* GPU_REGISTRY_PATHS[] = {
     L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000",
     L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0001",
+    L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0002",
     NULL
 };
 
 static const wchar_t* NVME_REGISTRY_PATHS[] = {
-    L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}",
-    L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e96b-e325-11ce-bfc1-08002be10318}",
+    L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e96b-e325-11ce-bfc1-08002be10318}\\0000",
+    L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e96b-e325-11ce-bfc1-08002be10318}\\0001",
+    NULL
+};
+
+static const wchar_t* STORAGE_CONTROLLER_PATHS[] = {
+    L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e96a-e325-11ce-bfc1-08002be10318}",
+    L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e97b-e325-11ce-bfc1-08002be10318}",
     NULL
 };
 
@@ -428,13 +461,32 @@ static NTSTATUS HookedDiskDispatch(PDEVICE_OBJECT device_object, PIRP irp) {
         ctx = GetDeviceContext(wdf_device);
     }
 
-    if (ctx && irp && irp->Tail.Overlay.OriginalFileObject) {
+    if (ctx && irp) {
         PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(irp);
 
         if (stack->MajorFunction == IRP_MJ_DEVICE_CONTROL) {
             ULONG ioctl = stack->Parameters.DeviceIoControl.IoControlCode;
 
-            if (ioctl == 0x2D1400 || ioctl == 0x7C088 || ioctl == 0x7000C) {
+            if (ioctl == IOCTL_STORAGE_QUERY_PROPERTY ||
+                ioctl == IOCTL_DISK_GET_DRIVE_GEOMETRY ||
+                ioctl == IOCTL_DISK_GET_DRIVE_GEOMETRY_EX ||
+                ioctl == IOCTL_DISK_GET_PARTITION_INFO ||
+                ioctl == IOCTL_DISK_GET_PARTITION_INFO_EX ||
+                ioctl == IOCTL_DISK_GET_LENGTH_INFO ||
+                ioctl == IOCTL_ATA_PASS_THROUGH ||
+                ioctl == IOCTL_ATA_PASS_THROUGH_DIRECT ||
+                ioctl == IOCTL_SCSI_PASS_THROUGH ||
+                ioctl == IOCTL_SCSI_PASS_THROUGH_DIRECT ||
+                ioctl == IOCTL_STORAGE_GET_MEDIA_TYPES ||
+                ioctl == IOCTL_STORAGE_GET_MEDIA_TYPES_EX ||
+                ioctl == IOCTL_STORAGE_GET_DEVICE_NUMBER ||
+                ioctl == IOCTL_STORAGE_READ_CAPACITY ||
+                ioctl == IOCTL_STORAGE_READ_CAPACITY16 ||
+                ioctl == IOCTL_STORAGE_PROTOCOL_COMMAND ||
+                ioctl == IOCTL_DISK_GET_DRIVE_LAYOUT ||
+                ioctl == IOCTL_DISK_GET_DRIVE_LAYOUT_EX ||
+                ioctl == IOCTL_DISK_GET_DRIVE_LAYOUT_EX2)
+            {
                 for (int i = 0; i < ctx->disks_hooked && i < MAX_HOOKED_DISKS; i++) {
                     if (ctx->disk_hooks[i].device_object == device_object && ctx->disk_hooks[i].hooked) {
                         irp->IoStatus.Status = STATUS_SUCCESS;
@@ -947,6 +999,27 @@ static NTSTATUS SpoofNVMe(PDEVICE_CONTEXT ctx, ULONG64* seed) {
     return STATUS_SUCCESS;
 }
 
+static NTSTATUS ClearTPM(PDEVICE_CONTEXT ctx, ULONG64* seed) {
+    if (ctx->original_tpm_owner[0] == L'\0') {
+        ReadRegistryString(
+            L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Services\\TPM\\WMI",
+            L"OwnerAuth", ctx->original_tpm_owner, 64);
+    }
+
+    wchar_t new_tpm_owner[64];
+    GenerateRandomHex(new_tpm_owner, 40, seed);
+    WriteRegistryString(
+        L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Services\\TPM\\WMI",
+        L"OwnerAuth", new_tpm_owner);
+
+    WriteRegistryDword(
+        L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Services\\TPM\\WMI",
+        L"TPMReady", 0);
+
+    ctx->tpm_cleared = TRUE;
+    return STATUS_SUCCESS;
+}
+
 static NTSTATUS DoSpoofAll(PDEVICE_CONTEXT ctx, PSPOOF_REQUEST req) {
     ULONG64 seed = req->seed;
     if (seed == 0) {
@@ -964,6 +1037,7 @@ static NTSTATUS DoSpoofAll(PDEVICE_CONTEXT ctx, PSPOOF_REQUEST req) {
     if (req->spoof_smbios) SpoofSMBIOS(ctx, &seed);
     if (req->spoof_wmi) SpoofWMI(ctx, &seed);
     if (req->spoof_nvme) SpoofNVMe(ctx, &seed);
+    if (req->spoof_tpm) ClearTPM(ctx, &seed);
 
     DbgPrint("[ZypherSpoofer] All vectors spoofed with seed %llu\n", seed);
     DbgPrint("[ZypherSpoofer] Disks hooked: %lu, Adapters spoofed: %lu\n",
@@ -1029,10 +1103,14 @@ static NTSTATUS DoRestoreAll(PDEVICE_CONTEXT ctx) {
     ctx->wmi_spoofed = FALSE;
     ctx->cpu_spoofed = FALSE;
     ctx->nvme_spoofed = FALSE;
+    ctx->tpm_cleared = FALSE;
+    ctx->acpi_patched = FALSE;
+    ctx->driver_hidden = FALSE;
     ctx->disk_hooked = FALSE;
     ctx->ndis_hooked = FALSE;
     ctx->adapters_spoofed = 0;
     ctx->disks_hooked = 0;
+    ctx->smbios_entries = 0;
 
     DbgPrint("[ZypherSpoofer] All vectors restored\n");
     return STATUS_SUCCESS;
@@ -1083,6 +1161,9 @@ static void EvtIoDeviceControl(WDFQUEUE queue, WDFREQUEST request,
             out_status->ndis_hooked = ctx->ndis_hooked;
             out_status->cpu_spoofed = ctx->cpu_spoofed;
             out_status->nvme_spoofed = ctx->nvme_spoofed;
+            out_status->tpm_cleared = ctx->tpm_cleared;
+            out_status->acpi_patched = ctx->acpi_patched;
+            out_status->driver_hidden = ctx->driver_hidden;
             out_status->seed = ctx->random_seed;
             out_status->adapters_spoofed = ctx->adapters_spoofed;
             out_status->disks_hooked = ctx->disks_hooked;
