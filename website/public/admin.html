@@ -53,25 +53,126 @@
         .product-item p { color: #c0b0e0; font-size: 14px; margin-bottom: 10px; }
         .tier-tags { display: flex; gap: 8px; flex-wrap: wrap; }
         .tier-tag { background: rgba(167,139,250,0.1); padding: 4px 12px; border-radius: 6px; font-size: 12px; color: #a78bfa; }
+
+        /* Login styles */
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f0a1a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: #1a1028; border: 1px solid #3a2a5a; border-radius: 16px; padding: 48px; width: 100%; max-width: 400px; }
+        .login-box h1 { color: #a78bfa; text-align: center; margin-bottom: 8px; font-size: 28px; }
+        .login-box h1::before { content: "\25C6 "; }
+        .login-box .subtitle { text-align: center; color: #8880a0; margin-bottom: 32px; font-size: 14px; }
+        .login-box .form-group { margin-bottom: 20px; }
+        .login-box .btn-primary { width: 100%; padding: 14px; font-size: 16px; margin-top: 8px; }
+        .login-error { color: #ef4444; text-align: center; margin-top: 16px; font-size: 13px; min-height: 20px; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 30px; }
+        .stat-card { background: #0f0a1a; border: 1px solid #3a2a5a; border-radius: 10px; padding: 20px; text-align: center; }
+        .stat-card .num { font-size: 28px; font-weight: bold; color: #a78bfa; }
+        .stat-card .label { font-size: 12px; color: #8880a0; margin-top: 4px; }
+        .logout-btn { background: none; border: 1px solid #3a2a5a; color: #8880a0; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+        .logout-btn:hover { color: #e0d0f0; border-color: #a78bfa; }
+        .key-display { background: #0f0a1a; padding: 16px; border-radius: 8px; border: 1px solid #3a2a5a; font-family: monospace; font-size: 16px; color: #a78bfa; text-align: center; margin-top: 12px; word-break: break-all; }
+        .copy-btn { background: #7c3aed; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-left: 8px; }
     </style>
 </head>
 <body>
     <div class="bg-animation"></div>
-    <nav>
+
+    <!-- Login Screen -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <h1>Zypher</h1>
+            <p class="subtitle">Admin Panel</p>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUser" placeholder="admin" value="admin">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPass" placeholder="Enter password">
+            </div>
+            <button class="btn btn-primary" onclick="doLogin()">Login</button>
+            <div id="loginError" class="login-error"></div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <nav id="adminNav" class="hidden">
         <div class="nav-container">
             <a href="/" class="logo">Zypher</a>
             <ul class="nav-links">
                 <li><a href="/">Website</a></li>
                 <li><a href="/admin">Admin</a></li>
+                <li><button class="logout-btn" onclick="doLogout()">Logout</button></li>
             </ul>
         </div>
     </nav>
-    <div class="container">
+
+    <div id="adminContent" class="container hidden">
         <div class="header">
             <h1>Admin Panel</h1>
             <a href="/" class="btn btn-outline">View Website</a>
         </div>
+
+        <div class="stats">
+            <div class="stat-card"><div class="num" id="statProducts">-</div><div class="label">Products</div></div>
+            <div class="stat-card"><div class="num" id="statOrders">-</div><div class="label">Orders</div></div>
+            <div class="stat-card"><div class="num" id="statKeys">-</div><div class="label">Keys</div></div>
+            <div class="stat-card"><div class="num" id="statRevenue">-</div><div class="label">Revenue</div></div>
+        </div>
+
         <div id="alert" class="alert hidden"></div>
+
+        <div class="section">
+            <h2>Generate License Key</h2>
+            <div class="form-row" style="display:flex;gap:12px;flex-wrap:wrap;">
+                <div class="form-group" style="flex:1;min-width:150px;">
+                    <label>Product</label>
+                    <select id="genProduct" style="width:100%;padding:12px;background:#0f0a1a;border:1px solid #3a2a5a;border-radius:8px;color:#e0d0f0;font-size:14px;">
+                        <option value="zypher">Zypher Loader</option>
+                        <option value="spoofer">HWID Spoofer</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex:1;min-width:150px;">
+                    <label>Duration</label>
+                    <select id="genDuration" style="width:100%;padding:12px;background:#0f0a1a;border:1px solid #3a2a5a;border-radius:8px;color:#e0d0f0;font-size:14px;">
+                        <option value="3">3 Days</option>
+                        <option value="7">1 Week</option>
+                        <option value="30" selected>1 Month</option>
+                        <option value="0">Lifetime</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex:1;min-width:150px;">
+                    <label>HWID Changes</label>
+                    <select id="genHwid" style="width:100%;padding:12px;background:#0f0a1a;border:1px solid #3a2a5a;border-radius:8px;color:#e0d0f0;font-size:14px;">
+                        <option value="1">1</option>
+                        <option value="3" selected>3</option>
+                        <option value="5">5</option>
+                        <option value="99">Unlimited</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display:flex;align-items:end;">
+                    <button class="btn btn-primary" onclick="generateKey()">Generate Key</button>
+                </div>
+            </div>
+            <div id="generatedKey" class="key-display hidden"></div>
+        </div>
+
+        <div class="section">
+            <h2>Change Password</h2>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <div class="form-group" style="flex:1;min-width:200px;">
+                    <label>Current Password</label>
+                    <input type="password" id="curPass" placeholder="Current password">
+                </div>
+                <div class="form-group" style="flex:1;min-width:200px;">
+                    <label>New Password</label>
+                    <input type="password" id="newPass" placeholder="New password (min 6 chars)">
+                </div>
+                <div class="form-group" style="display:flex;align-items:end;">
+                    <button class="btn btn-primary" onclick="changePassword()">Update</button>
+                </div>
+            </div>
+        </div>
+
         <div class="section">
             <h2>Add New Product</h2>
             <div class="form-group">
@@ -89,25 +190,133 @@
                 <button class="btn btn-primary" onclick="addProduct()">Add Product</button>
             </div>
         </div>
+
         <div class="section">
             <h2>Products</h2>
             <div id="productsList"><div class="empty">No products yet</div></div>
         </div>
+
         <div class="section">
             <h2>Recent Orders</h2>
             <table><thead><tr><th>Order ID</th><th>Email</th><th>Product</th><th>Tier</th><th>Amount</th><th>Key</th><th>Date</th></tr></thead><tbody id="ordersBody"></tbody></table>
         </div>
+
         <div class="section">
             <h2>License Keys</h2>
             <table><thead><tr><th>Key</th><th>Product</th><th>Tier</th><th>Email</th><th>Expires</th><th>Status</th><th>Created</th></tr></thead><tbody id="keysBody"></tbody></table>
         </div>
     </div>
+
     <script>
+        let authToken = localStorage.getItem('zypher_admin_token');
+
+        function headers() {
+            var h = { 'Content-Type': 'application/json' };
+            if (authToken) h['Authorization'] = 'Bearer ' + authToken;
+            return h;
+        }
+
+        function doLogin() {
+            var user = document.getElementById('loginUser').value;
+            var pass = document.getElementById('loginPass').value;
+            var errEl = document.getElementById('loginError');
+            errEl.textContent = '';
+
+            if (!user || !pass) { errEl.textContent = 'Fill in all fields'; return; }
+
+            fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            }).then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.token) {
+                    authToken = data.token;
+                    localStorage.setItem('zypher_admin_token', authToken);
+                    showDashboard();
+                } else {
+                    errEl.textContent = data.error || 'Login failed';
+                }
+            }).catch(function() {
+                errEl.textContent = 'Connection error';
+            });
+        }
+
+        function doLogout() {
+            authToken = null;
+            localStorage.removeItem('zypher_admin_token');
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('adminNav').classList.add('hidden');
+            document.getElementById('adminContent').classList.add('hidden');
+        }
+
+        function showDashboard() {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('adminNav').classList.remove('hidden');
+            document.getElementById('adminContent').classList.remove('hidden');
+            loadAll();
+        }
+
         function showAlert(msg, type) {
             var el = document.getElementById('alert');
             el.textContent = msg;
             el.className = 'alert alert-' + type;
             setTimeout(function() { el.className = 'alert hidden'; }, 5000);
+        }
+
+        function generateKey() {
+            var product = document.getElementById('genProduct').value;
+            var duration = parseInt(document.getElementById('genDuration').value);
+            var hwidChanges = parseInt(document.getElementById('genHwid').value);
+
+            var segments = [];
+            for (var i = 0; i < 4; i++) {
+                var seg = '';
+                for (var j = 0; j < 8; j++) seg += '0123456789ABCDEF'[Math.floor(Math.random() * 16)];
+                segments.push(seg);
+            }
+            var key = segments.join('-');
+
+            var expiresAt = duration > 0 ? new Date(Date.now() + duration * 24 * 60 * 60 * 1000).toISOString() : null;
+
+            var keyDoc = {
+                key: key,
+                product: product,
+                duration_days: duration,
+                max_hwid_changes: hwidChanges,
+                hwid_change_count: 0,
+                is_active: 1,
+                created_at: new Date().toISOString(),
+                expires_at: expiresAt,
+                used: false
+            };
+
+            var el = document.getElementById('generatedKey');
+            el.innerHTML = key + ' <button class="copy-btn" onclick="navigator.clipboard.writeText(\'' + key + '\');this.textContent=\'Copied\'">Copy</button>';
+            el.classList.remove('hidden');
+            showAlert('Key generated: ' + (duration > 0 ? duration + ' days' : 'Lifetime') + ', ' + hwidChanges + ' HWID changes', 'success');
+        }
+
+        function changePassword() {
+            var cur = document.getElementById('curPass').value;
+            var newP = document.getElementById('newPass').value;
+            if (!cur || !newP) { showAlert('Fill in both fields', 'error'); return; }
+            if (newP.length < 6) { showAlert('Password must be at least 6 characters', 'error'); return; }
+
+            fetch('/api/admin/change-password', {
+                method: 'POST',
+                headers: headers(),
+                body: JSON.stringify({ current_password: cur, new_password: newP })
+            }).then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showAlert('Password updated!', 'success');
+                    document.getElementById('curPass').value = '';
+                    document.getElementById('newPass').value = '';
+                } else {
+                    showAlert(data.error || 'Failed', 'error');
+                }
+            }).catch(function() { showAlert('Connection error', 'error'); });
         }
 
         function addTier() {
@@ -141,7 +350,7 @@
 
             fetch('/api/admin/products', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers(),
                 body: JSON.stringify({ name: name, description: desc, tiers: tiers })
             }).then(function(res) { return res.json(); })
             .then(function(data) {
@@ -171,38 +380,56 @@
                     }).join('');
                     return '<div class="product-item"><h4>' + p.name + '</h4><p>' + p.description + '</p><div class="tier-tags">' + tags + '</div></div>';
                 }).join('');
+                document.getElementById('statProducts').textContent = products.length;
             });
         }
 
         function loadOrders() {
-            fetch('/api/admin/orders').then(function(res) { return res.json(); })
+            fetch('/api/admin/orders', { headers: headers() }).then(function(res) { return res.json(); })
             .then(function(orders) {
                 var tbody = document.getElementById('ordersBody');
-                if (orders.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No orders yet</td></tr>'; return; }
+                if (!Array.isArray(orders) || orders.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No orders yet</td></tr>'; return; }
                 tbody.innerHTML = orders.map(function(o) {
-                    return '<tr><td style="font-family:monospace;font-size:11px;">' + o.id.substring(0,16) + '...</td><td>' + o.email + '</td><td>' + o.product_name + '</td><td>' + (o.tier_name||'-') + '</td><td>$' + (o.amount/100).toFixed(2) + '</td><td style="font-family:monospace;font-size:11px;">' + o.license_key + '</td><td>' + new Date(o.created_at).toLocaleDateString() + '</td></tr>';
+                    return '<tr><td style="font-family:monospace;font-size:11px;">' + (o.id||'').substring(0,16) + '...</td><td>' + o.email + '</td><td>' + o.product_name + '</td><td>' + (o.tier_name||'-') + '</td><td>$' + ((o.amount||0)/100).toFixed(2) + '</td><td style="font-family:monospace;font-size:11px;">' + o.license_key + '</td><td>' + new Date(o.created_at).toLocaleDateString() + '</td></tr>';
                 }).join('');
+                document.getElementById('statOrders').textContent = orders.length;
+                var revenue = orders.reduce(function(sum, o) { return sum + (o.amount||0); }, 0);
+                document.getElementById('statRevenue').textContent = '$' + (revenue/100).toFixed(0);
+            }).catch(function() {
+                document.getElementById('ordersBody').innerHTML = '<tr><td colspan="7" class="empty">Login required</td></tr>';
             });
         }
 
         function loadKeys() {
-            fetch('/api/admin/keys').then(function(res) { return res.json(); })
+            fetch('/api/admin/keys', { headers: headers() }).then(function(res) { return res.json(); })
             .then(function(keys) {
                 var tbody = document.getElementById('keysBody');
-                if (keys.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No keys yet</td></tr>'; return; }
+                if (!Array.isArray(keys) || keys.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No keys yet</td></tr>'; return; }
                 tbody.innerHTML = keys.map(function(k) {
                     var exp = k.expires_at ? new Date(k.expires_at).toLocaleDateString() : 'Lifetime';
                     var badge = k.used ? '<span class="badge badge-used">Used</span>' : '<span class="badge badge-active">Unused</span>';
                     return '<tr><td style="font-family:monospace;font-size:11px;">' + k.key + '</td><td>' + k.product_id + '</td><td>' + (k.tier_name||'-') + '</td><td>' + k.email + '</td><td>' + exp + '</td><td>' + badge + '</td><td>' + new Date(k.created_at).toLocaleDateString() + '</td></tr>';
                 }).join('');
+                document.getElementById('statKeys').textContent = keys.length;
+            }).catch(function() {
+                document.getElementById('keysBody').innerHTML = '<tr><td colspan="7" class="empty">Login required</td></tr>';
             });
         }
 
-        window.addEventListener('DOMContentLoaded', function() {
-            addTier();
+        function loadAll() {
             loadProducts();
             loadOrders();
             loadKeys();
+        }
+
+        // Auto-login if token exists
+        if (authToken) {
+            showDashboard();
+        }
+
+        // Enter key on login
+        document.getElementById('loginPass').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') doLogin();
         });
     </script>
 </body>

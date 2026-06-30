@@ -17,6 +17,7 @@
                 <li><a href="#products">Products</a></li>
                 <li><a href="#stats">About</a></li>
                 <li><a href="#" onclick="openModal('contact')">Contact</a></li>
+                <li id="navAuthLink"><a href="#" onclick="openModal('login')">Login</a></li>
             </ul>
         </div>
     </nav>
@@ -141,6 +142,52 @@
                 <button class="btn-cancel" onclick="closeModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="sendContact()">Send Message</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>Welcome Back</h2>
+            <div id="loginError" class="auth-error"></div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="doUserLogin()">Login</button>
+            </div>
+            <p class="auth-switch">Don't have an account? <a href="#" onclick="switchToRegister()">Register</a></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <h2>Create Account</h2>
+            <div id="registerError" class="auth-error"></div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="regUsername" placeholder="Choose a username">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" placeholder="Min 6 characters">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="doUserRegister()">Register</button>
+            </div>
+            <p class="auth-switch">Already have an account? <a href="#" onclick="switchToLogin()">Login</a></p>
         </div>
     </div>
 

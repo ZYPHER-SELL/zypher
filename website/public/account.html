@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - Zypher</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0f0a1a; color: #e0d0f0; }
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(135deg, #0f0a1a 0%, #1a1028 50%, #0f0a1a 100%); }
+        .bg-animation::before { content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(circle, rgba(167, 139, 250, 0.1) 0%, transparent 70%); animation: rotate 30s linear infinite; }
+        @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        nav { position: fixed; top: 0; width: 100%; padding: 20px 50px; background: rgba(15,10,26,0.95); backdrop-filter: blur(10px); z-index: 1000; border-bottom: 1px solid #3a2a5a; }
+        .nav-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 28px; font-weight: bold; color: #a78bfa; text-decoration: none; }
+        .logo::before { content: "\25C6 "; }
+        .nav-links { display: flex; gap: 30px; list-style: none; align-items: center; }
+        .nav-links a { color: #e0d0f0; text-decoration: none; font-weight: 500; }
+        .nav-links a:hover { color: #a78bfa; }
+        .logout-btn { background: none; border: 1px solid #3a2a5a; color: #8880a0; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.3s; }
+        .logout-btn:hover { color: #e0d0f0; border-color: #a78bfa; }
+        .container { max-width: 1200px; margin: 100px auto 40px; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 16px; }
+        .header h1 { color: #a78bfa; font-size: 36px; }
+        .welcome-text { color: #c0b0e0; font-size: 16px; }
+        .btn { padding: 12px 24px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s; text-decoration: none; display: inline-block; }
+        .btn-primary { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(124,58,237,0.4); }
+        .btn-outline { background: transparent; color: #a78bfa; border: 2px solid #a78bfa; }
+        .btn-outline:hover { background: #a78bfa; color: white; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px; }
+        .stat-card { background: #1a1028; border: 1px solid #3a2a5a; border-radius: 10px; padding: 24px; text-align: center; }
+        .stat-card .num { font-size: 32px; font-weight: bold; color: #a78bfa; }
+        .stat-card .label { font-size: 13px; color: #8880a0; margin-top: 4px; }
+        .section { background: #1a1028; padding: 30px; border-radius: 12px; border: 1px solid #3a2a5a; margin-bottom: 30px; }
+        .section h2 { color: #a78bfa; margin-bottom: 20px; font-size: 24px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #3a2a5a; }
+        th { color: #a78bfa; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+        td { color: #e0d0f0; font-size: 14px; }
+        .badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .badge-active { background: rgba(34,197,94,0.2); color: #22c55e; }
+        .badge-expired { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .badge-lifetime { background: rgba(167,139,250,0.2); color: #a78bfa; }
+        .empty { text-align: center; padding: 40px; color: #8880a0; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #c0b0e0; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px; background: #0f0a1a; border: 1px solid #3a2a5a; border-radius: 8px; color: #e0d0f0; font-size: 16px; }
+        .form-group input:focus { outline: none; border-color: #a78bfa; }
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; }
+        .alert-success { background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #22c55e; }
+        .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
+        .hidden { display: none !important; }
+        .key-value { font-family: monospace; font-size: 13px; background: #0f0a1a; padding: 6px 10px; border-radius: 4px; color: #a78bfa; }
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f0a1a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: #1a1028; border: 1px solid #3a2a5a; border-radius: 16px; padding: 48px; width: 100%; max-width: 420px; }
+        .login-box h1 { color: #a78bfa; text-align: center; margin-bottom: 8px; font-size: 28px; }
+        .login-box h1::before { content: "\25C6 "; }
+        .login-box .subtitle { text-align: center; color: #8880a0; margin-bottom: 32px; font-size: 14px; }
+        .login-box .form-group { margin-bottom: 20px; }
+        .login-box .btn-primary { width: 100%; padding: 14px; font-size: 16px; margin-top: 8px; }
+        .login-error { color: #ef4444; text-align: center; margin-top: 16px; font-size: 13px; min-height: 20px; }
+        .auth-switch { text-align: center; margin-top: 20px; color: #8880a0; font-size: 14px; }
+        .auth-switch a { color: #a78bfa; text-decoration: none; font-weight: 600; }
+        .auth-switch a:hover { text-decoration: underline; }
+        @media (max-width: 768px) { .nav-links { display: none; } .header h1 { font-size: 28px; } }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <h1>Zypher</h1>
+            <p class="subtitle">My Account</p>
+            <div id="authTabs" style="display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid #3a2a5a;">
+                <button id="tabLogin" onclick="showTab('login')" style="flex:1;padding:12px;background:none;border:none;border-bottom:2px solid #a78bfa;color:#a78bfa;font-size:15px;font-weight:600;cursor:pointer;">Login</button>
+                <button id="tabRegister" onclick="showTab('register')" style="flex:1;padding:12px;background:none;border:none;border-bottom:2px solid transparent;color:#8880a0;font-size:15px;font-weight:600;cursor:pointer;">Register</button>
+            </div>
+            <div id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password">
+                </div>
+                <button class="btn btn-primary" onclick="doLogin()">Login</button>
+                <div id="loginError" class="login-error"></div>
+            </div>
+            <div id="registerForm" class="hidden">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="regUsername" placeholder="Choose a username">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" placeholder="Min 6 characters">
+                </div>
+                <button class="btn btn-primary" onclick="doRegister()">Create Account</button>
+                <div id="registerError" class="login-error"></div>
+            </div>
+        </div>
+    </div>
+
+    <nav id="accountNav" class="hidden">
+        <div class="nav-container">
+            <a href="/" class="logo">Zypher</a>
+            <ul class="nav-links">
+                <li><a href="/">Shop</a></li>
+                <li><a href="/account">Account</a></li>
+                <li><span id="navUsername" style="color:#a78bfa;font-weight:600;"></span></li>
+                <li><button class="logout-btn" onclick="doLogout()">Logout</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="accountContent" class="container hidden">
+        <div class="header">
+            <div>
+                <h1>My Account</h1>
+                <p class="welcome-text">Welcome back, <span id="welcomeName"></span></p>
+            </div>
+            <a href="/" class="btn btn-outline">Browse Products</a>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card"><div class="num" id="statOrders">-</div><div class="label">Orders</div></div>
+            <div class="stat-card"><div class="num" id="statKeys">-</div><div class="label">License Keys</div></div>
+            <div class="stat-card"><div class="num" id="statActive">-</div><div class="label">Active Keys</div></div>
+            <div class="stat-card"><div class="num" id="statSpent">-</div><div class="label">Total Spent</div></div>
+        </div>
+
+        <div id="alertBox" class="alert hidden"></div>
+
+        <div class="section">
+            <h2>My License Keys</h2>
+            <table>
+                <thead><tr><th>Key</th><th>Product</th><th>Tier</th><th>Expires</th><th>Status</th></tr></thead>
+                <tbody id="keysBody"></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Order History</h2>
+            <table>
+                <thead><tr><th>Order ID</th><th>Product</th><th>Tier</th><th>Amount</th><th>Key</th><th>Date</th></tr></thead>
+                <tbody id="ordersBody"></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Change Password</h2>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <div class="form-group" style="flex:1;min-width:200px;">
+                    <label>Current Password</label>
+                    <input type="password" id="curPass" placeholder="Current password">
+                </div>
+                <div class="form-group" style="flex:1;min-width:200px;">
+                    <label>New Password</label>
+                    <input type="password" id="newPass" placeholder="Min 6 characters">
+                </div>
+                <div class="form-group" style="display:flex;align-items:end;">
+                    <button class="btn btn-primary" onclick="changePassword()">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var authToken = localStorage.getItem('zypher_user_token');
+        var userData = JSON.parse(localStorage.getItem('zypher_user_data') || 'null');
+
+        function headers() {
+            var h = { 'Content-Type': 'application/json' };
+            if (authToken) h['Authorization'] = 'Bearer ' + authToken;
+            return h;
+        }
+
+        function showTab(tab) {
+            document.getElementById('loginError').textContent = '';
+            document.getElementById('registerError').textContent = '';
+            if (tab === 'login') {
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('registerForm').classList.add('hidden');
+                document.getElementById('tabLogin').style.borderBottomColor = '#a78bfa';
+                document.getElementById('tabLogin').style.color = '#a78bfa';
+                document.getElementById('tabRegister').style.borderBottomColor = 'transparent';
+                document.getElementById('tabRegister').style.color = '#8880a0';
+            } else {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('registerForm').classList.remove('hidden');
+                document.getElementById('tabRegister').style.borderBottomColor = '#a78bfa';
+                document.getElementById('tabRegister').style.color = '#a78bfa';
+                document.getElementById('tabLogin').style.borderBottomColor = 'transparent';
+                document.getElementById('tabLogin').style.color = '#8880a0';
+            }
+        }
+
+        function doLogin() {
+            var email = document.getElementById('loginEmail').value;
+            var password = document.getElementById('loginPassword').value;
+            var errEl = document.getElementById('loginError');
+            errEl.textContent = '';
+            if (!email || !password) { errEl.textContent = 'Please fill in all fields'; return; }
+
+            fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, password: password })
+            }).then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.token) {
+                    authToken = data.token;
+                    userData = data.user;
+                    localStorage.setItem('zypher_user_token', authToken);
+                    localStorage.setItem('zypher_user_data', JSON.stringify(userData));
+                    showDashboard();
+                } else {
+                    errEl.textContent = data.error || 'Login failed';
+                }
+            }).catch(function() { errEl.textContent = 'Connection error'; });
+        }
+
+        function doRegister() {
+            var username = document.getElementById('regUsername').value;
+            var email = document.getElementById('regEmail').value;
+            var password = document.getElementById('regPassword').value;
+            var errEl = document.getElementById('registerError');
+            errEl.textContent = '';
+            if (!username || !email || !password) { errEl.textContent = 'Please fill in all fields'; return; }
+            if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
+
+            fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: username, email: email, password: password })
+            }).then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.token) {
+                    authToken = data.token;
+                    userData = data.user;
+                    localStorage.setItem('zypher_user_token', authToken);
+                    localStorage.setItem('zypher_user_data', JSON.stringify(userData));
+                    showDashboard();
+                } else {
+                    errEl.textContent = data.error || 'Registration failed';
+                }
+            }).catch(function() { errEl.textContent = 'Connection error'; });
+        }
+
+        function doLogout() {
+            authToken = null;
+            userData = null;
+            localStorage.removeItem('zypher_user_token');
+            localStorage.removeItem('zypher_user_data');
+            window.location.href = '/';
+        }
+
+        function showDashboard() {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('accountNav').classList.remove('hidden');
+            document.getElementById('accountContent').classList.remove('hidden');
+            document.getElementById('welcomeName').textContent = userData ? userData.username : '';
+            document.getElementById('navUsername').textContent = userData ? userData.username : '';
+            loadKeys();
+            loadOrders();
+        }
+
+        function showAlert(msg, type) {
+            var el = document.getElementById('alertBox');
+            el.textContent = msg;
+            el.className = 'alert alert-' + type;
+            setTimeout(function() { el.className = 'alert hidden'; }, 5000);
+        }
+
+        function loadKeys() {
+            fetch('/api/user/keys', { headers: headers() }).then(function(res) {
+                if (res.status === 401) { doLogout(); return; }
+                return res.json();
+            })
+            .then(function(keys) {
+                if (!keys) return;
+                var tbody = document.getElementById('keysBody');
+                if (keys.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="empty">No license keys yet. Purchase a product to get started!</td></tr>'; return; }
+                tbody.innerHTML = keys.map(function(k) {
+                    var exp = k.expires_at ? new Date(k.expires_at).toLocaleDateString() : 'Lifetime';
+                    var status;
+                    if (!k.expires_at) { status = '<span class="badge badge-lifetime">Lifetime</span>'; }
+                    else if (new Date(k.expires_at) > new Date()) { status = '<span class="badge badge-active">Active</span>'; }
+                    else { status = '<span class="badge badge-expired">Expired</span>'; }
+                    return '<tr><td class="key-value">' + k.key + '</td><td>' + (k.product_id || '-') + '</td><td>' + (k.tier_name || '-') + '</td><td>' + exp + '</td><td>' + status + '</td></tr>';
+                }).join('');
+                document.getElementById('statKeys').textContent = keys.length;
+                var active = keys.filter(function(k) { return !k.expires_at || new Date(k.expires_at) > new Date(); }).length;
+                document.getElementById('statActive').textContent = active;
+            }).catch(function() {});
+        }
+
+        function loadOrders() {
+            fetch('/api/user/orders', { headers: headers() }).then(function(res) {
+                if (res.status === 401) { doLogout(); return; }
+                return res.json();
+            })
+            .then(function(orders) {
+                if (!orders) return;
+                var tbody = document.getElementById('ordersBody');
+                if (orders.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty">No orders yet</td></tr>'; return; }
+                tbody.innerHTML = orders.map(function(o) {
+                    return '<tr><td style="font-family:monospace;font-size:11px;">' + (o.id || '').substring(0, 16) + '...</td><td>' + (o.product_name || '-') + '</td><td>' + (o.tier_name || '-') + '</td><td>$' + ((o.amount || 0) / 100).toFixed(2) + '</td><td class="key-value">' + (o.license_key || '-') + '</td><td>' + new Date(o.created_at).toLocaleDateString() + '</td></tr>';
+                }).join('');
+                document.getElementById('statOrders').textContent = orders.length;
+                var total = orders.reduce(function(sum, o) { return sum + (o.amount || 0); }, 0);
+                document.getElementById('statSpent').textContent = '$' + (total / 100).toFixed(2);
+            }).catch(function() {});
+        }
+
+        function changePassword() {
+            var cur = document.getElementById('curPass').value;
+            var newP = document.getElementById('newPass').value;
+            if (!cur || !newP) { showAlert('Fill in both fields', 'error'); return; }
+            if (newP.length < 6) { showAlert('Password must be at least 6 characters', 'error'); return; }
+
+            fetch('/api/auth/change-password', {
+                method: 'POST',
+                headers: headers(),
+                body: JSON.stringify({ current_password: cur, new_password: newP })
+            }).then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showAlert('Password updated!', 'success');
+                    document.getElementById('curPass').value = '';
+                    document.getElementById('newPass').value = '';
+                } else {
+                    showAlert(data.error || 'Failed', 'error');
+                }
+            }).catch(function() { showAlert('Connection error', 'error'); });
+        }
+
+        if (authToken && userData) {
+            showDashboard();
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if (!document.getElementById('loginForm').classList.contains('hidden')) {
+                    doLogin();
+                } else if (!document.getElementById('registerForm').classList.contains('hidden')) {
+                    doRegister();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

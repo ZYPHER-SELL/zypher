@@ -1,6 +1,91 @@
 let selectedProduct = null;
 let selectedTier = null;
 
+function checkUserAuth() {
+    const token = localStorage.getItem('zypher_user_token');
+    const user = JSON.parse(localStorage.getItem('zypher_user_data') || 'null');
+    const navLink = document.getElementById('navAuthLink');
+    if (token && user && navLink) {
+        navLink.innerHTML = '<a href="/account">' + user.username + '</a>';
+    }
+}
+
+function openModal(type) {
+    if (type === 'contact') {
+        document.getElementById('contactModal').classList.add('active');
+    } else if (type === 'login') {
+        document.getElementById('loginModal').classList.add('active');
+    } else if (type === 'register') {
+        document.getElementById('registerModal').classList.add('active');
+    }
+}
+
+function switchToRegister() {
+    document.getElementById('loginModal').classList.remove('active');
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('registerModal').classList.add('active');
+}
+
+function switchToLogin() {
+    document.getElementById('registerModal').classList.remove('active');
+    document.getElementById('registerError').textContent = '';
+    document.getElementById('loginModal').classList.add('active');
+}
+
+function doUserLogin() {
+    var email = document.getElementById('loginEmail').value;
+    var password = document.getElementById('loginPassword').value;
+    var errEl = document.getElementById('loginError');
+    errEl.textContent = '';
+
+    if (!email || !password) { errEl.textContent = 'Please fill in all fields'; return; }
+
+    fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: password })
+    }).then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.token) {
+            localStorage.setItem('zypher_user_token', data.token);
+            localStorage.setItem('zypher_user_data', JSON.stringify(data.user));
+            window.location.href = '/account';
+        } else {
+            errEl.textContent = data.error || 'Login failed';
+        }
+    }).catch(function() {
+        errEl.textContent = 'Connection error';
+    });
+}
+
+function doUserRegister() {
+    var username = document.getElementById('regUsername').value;
+    var email = document.getElementById('regEmail').value;
+    var password = document.getElementById('regPassword').value;
+    var errEl = document.getElementById('registerError');
+    errEl.textContent = '';
+
+    if (!username || !email || !password) { errEl.textContent = 'Please fill in all fields'; return; }
+    if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
+
+    fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, email: email, password: password })
+    }).then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.token) {
+            localStorage.setItem('zypher_user_token', data.token);
+            localStorage.setItem('zypher_user_data', JSON.stringify(data.user));
+            window.location.href = '/account';
+        } else {
+            errEl.textContent = data.error || 'Registration failed';
+        }
+    }).catch(function() {
+        errEl.textContent = 'Connection error';
+    });
+}
+
 async function loadProducts() {
     try {
         const response = await fetch('/api/products');
@@ -60,14 +145,10 @@ function openPurchaseModal(productId) {
     document.getElementById('purchaseModal').classList.add('active');
 }
 
-function openModal(type) {
-    if (type === 'contact') {
-        document.getElementById('contactModal').classList.add('active');
-    }
-}
-
 function closeModal() {
     document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('registerError').textContent = '';
 }
 
 async function completePurchase() {
@@ -132,7 +213,10 @@ document.querySelectorAll('.modal').forEach(modal => {
 });
 
 // Load products on page load
-window.addEventListener('DOMContentLoaded', loadProducts);
+window.addEventListener('DOMContentLoaded', function() {
+    loadProducts();
+    checkUserAuth();
+});
 
 // Smooth scroll for navigation links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -146,4 +230,14 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             });
         }
     });
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        if (document.getElementById('loginModal').classList.contains('active')) {
+            doUserLogin();
+        } else if (document.getElementById('registerModal').classList.contains('active')) {
+            doUserRegister();
+        }
+    }
 });
