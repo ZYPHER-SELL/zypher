@@ -257,3 +257,5 @@ app.get('/admin', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Zypher website running on port ${PORT}`);
 });
+
+module.exports = app;
